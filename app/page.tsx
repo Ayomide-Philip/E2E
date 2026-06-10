@@ -26,44 +26,42 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-white overflow-hidden">
+    <div className="min-h-screen w-full bg-gradient-to-br from-black via-zinc-950 to-black overflow-hidden">
       {/* Subtle grid background */}
       <div
-        className="absolute inset-0 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-50 dark:to-slate-100"
+        className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950 to-black"
         style={{
           backgroundImage:
-            "radial-gradient(circle, #e2e8f0 1px, transparent 1px)",
+            "radial-gradient(circle, #27272a 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
 
       {/* Navigation */}
-      <nav className="relative z-50 flex items-center justify-between px-8 py-6 md:px-16">
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-8 py-6 md:px-16 bg-black/30 backdrop-blur-md border-b border-zinc-800/20">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-black dark:text-black">
-            Private
-          </span>
+          <span className="text-xl font-bold text-white">Private</span>
         </div>
 
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           <a
             href="#"
-            className="text-sm font-medium text-slate-600 dark:text-slate-600 hover:text-black dark:hover:text-black transition-colors"
+            className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
           >
             How It Works
           </a>
           <a
             href="#"
-            className="text-sm font-medium text-slate-600 dark:text-slate-600 hover:text-black dark:hover:text-black transition-colors"
+            className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
           >
             Security
           </a>
         </div>
 
         {/* CTA Button */}
-        <button className="bg-black dark:bg-black text-white dark:text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors">
+        <button className="bg-white text-black px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-zinc-100 transition-colors">
           Start Chat
         </button>
       </nav>
@@ -80,11 +78,11 @@ export default function Home() {
               animate="animate"
               variants={floatingVariants}
             >
-              <div className="bg-white dark:bg-white rounded-2xl shadow-lg p-4 max-w-xs border border-slate-200 dark:border-slate-200">
-                <div className="text-sm font-semibold text-black dark:text-black mb-1">
+              <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg p-4 max-w-xs border border-zinc-800">
+                <div className="text-sm font-semibold text-white mb-1">
                   ✨ No Sign-up
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-600">
+                <p className="text-xs text-zinc-400">
                   Start chatting instantly without creating an account
                 </p>
               </div>
@@ -107,11 +105,11 @@ export default function Home() {
                 },
               }}
             >
-              <div className="bg-white dark:bg-white rounded-2xl shadow-lg p-4 max-w-xs border border-slate-200 dark:border-slate-200">
-                <div className="text-sm font-semibold text-black dark:text-black mb-1">
+              <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg p-4 max-w-xs border border-zinc-800">
+                <div className="text-sm font-semibold text-white mb-1">
                   🔒 End-to-End Encrypted
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-600">
+                <p className="text-xs text-zinc-400">
                   Messages are encrypted in your browser
                 </p>
               </div>
@@ -134,16 +132,16 @@ export default function Home() {
                 },
               }}
             >
-              <div className="bg-white dark:bg-white rounded-2xl shadow-lg p-5 max-w-xs border border-slate-200 dark:border-slate-200">
-                <div className="text-sm font-semibold text-black dark:text-black mb-2">
+              <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg p-5 max-w-xs border border-zinc-800">
+                <div className="text-sm font-semibold text-white mb-2">
                   ✓ Room Created
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-600 mb-3">
+                <p className="text-xs text-zinc-400 mb-3">
                   Share the link with a friend
                 </p>
                 <div className="flex gap-2">
-                  <div className="h-8 w-8 rounded-full bg-linear-to-br from-blue-400 to-blue-600 dark:from-blue-400 dark:to-blue-600" />
-                  <div className="h-8 w-8 rounded-full bg-linear-to-br from-purple-400 to-purple-600 dark:from-purple-400 dark:to-purple-600" />
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700" />
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700" />
                 </div>
               </div>
             </motion.div>
@@ -155,11 +153,11 @@ export default function Home() {
               animate="animate"
               variants={floatingVariants}
             >
-              <div className="bg-white dark:bg-white rounded-2xl shadow-lg p-4 max-w-xs border border-slate-200 dark:border-slate-200">
-                <div className="text-sm font-semibold text-black dark:text-black mb-1">
+              <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg p-4 max-w-xs border border-zinc-800">
+                <div className="text-sm font-semibold text-white mb-1">
                   🗑️ Auto-Delete
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-600">
+                <p className="text-xs text-zinc-400">
                   Messages disappear when everyone leaves
                 </p>
               </div>
@@ -175,7 +173,7 @@ export default function Home() {
                 transition: { delay: 0.2, duration: 0.5 },
               }}
             >
-              <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 dark:from-blue-500 dark:to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/20">
                 <span className="text-3xl">🔐</span>
               </div>
             </motion.div>
@@ -188,18 +186,16 @@ export default function Home() {
               variants={fadeInUp}
             >
               {/* Headline */}
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-black dark:text-black mb-6 leading-tight tracking-tight">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight">
                 Private conversations.
                 <br />
                 No accounts.
                 <br />
-                <span className="text-slate-400 dark:text-slate-400">
-                  No trace.
-                </span>
+                <span className="text-zinc-500">No trace.</span>
               </h1>
 
               {/* Supporting Text */}
-              <p className="text-base md:text-lg text-slate-600 dark:text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
                 Create a secure chat room, share the link, and start talking
                 instantly. Messages are encrypted in your browser and disappear
                 when the conversation ends.
@@ -209,7 +205,7 @@ export default function Home() {
               <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <motion.button
                   onClick={handleStartChatting}
-                  className="bg-black dark:bg-black text-white dark:text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-slate-800 dark:hover:bg-slate-800 transition-all duration-300 hover:shadow-xl"
+                  className="bg-white text-black px-8 py-4 rounded-xl font-semibold text-base hover:bg-zinc-100 transition-all duration-300 hover:shadow-xl hover:shadow-white/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -218,7 +214,7 @@ export default function Home() {
 
                 <motion.button
                   onClick={handleLearnMore}
-                  className="border-2 border-slate-300 dark:border-slate-300 text-black dark:text-black px-8 py-4 rounded-xl font-semibold text-base hover:bg-slate-100 dark:hover:bg-slate-100 transition-all duration-300"
+                  className="border-2 border-zinc-700 text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-zinc-900/50 hover:border-zinc-600 transition-all duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

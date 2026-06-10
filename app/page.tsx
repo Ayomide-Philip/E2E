@@ -35,7 +35,7 @@ export default function Home() {
         }}
       />
 
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 md:px-16 bg-black/20 backdrop-blur-md border-b border-zinc-800/20">
+      <nav className="sticky top-4 z-50 mx-auto flex w-[calc(100%-2rem)] max-w-6xl items-center justify-between rounded-full px-6 py-4 md:px-8 bg-black/20 backdrop-blur-2xl border border-white/10 shadow-[0_12px_35px_rgba(0,0,0,0.22)]">
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold text-white">Private</span>
         </div>
@@ -55,7 +55,7 @@ export default function Home() {
           </a>
         </div>
 
-        <button className="bg-white text-black px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-zinc-100 transition-colors">
+        <button className="bg-white/95 text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-white transition-colors shadow-sm shadow-black/20">
           Start Chat
         </button>
       </nav>

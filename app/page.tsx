@@ -64,7 +64,7 @@ export default function Home() {
         <div className="max-w-5xl w-full">
           <div className="relative h-full min-h-0 flex items-center justify-center">
             <motion.div
-              className="absolute top-0 left-0 md:-left-8 lg:-left-12"
+              className="hidden md:block absolute top-0 left-0 md:-left-8 lg:-left-12"
               initial="initial"
               animate="animate"
               variants={floatingVariants}
@@ -80,7 +80,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="absolute top-0 right-0 md:-right-8 lg:-right-12"
+              className="hidden md:block absolute top-0 right-0 md:-right-8 lg:-right-12"
               initial="initial"
               animate="animate"
               variants={{
@@ -106,7 +106,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="absolute bottom-0 left-0 md:-left-6 lg:-left-10"
+              className="hidden md:block absolute bottom-0 left-0 md:-left-6 lg:-left-10"
               initial="initial"
               animate="animate"
               variants={{
@@ -136,7 +136,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="absolute bottom-0 right-0 md:-right-8 lg:-right-12"
+              className="hidden md:block absolute bottom-0 right-0 md:-right-8 lg:-right-12"
               initial="initial"
               animate="animate"
               variants={floatingVariants}
@@ -152,7 +152,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="absolute -top-16 left-1/2 transform -translate-x-1/2"
+              className="hidden md:block absolute -top-16 left-1/2 transform -translate-x-1/2"
               initial={{ opacity: 0, scale: 0 }}
               animate={{
                 opacity: 1,

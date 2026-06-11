@@ -6,7 +6,8 @@ import { motion, Variants } from "framer-motion";
 
 export default function Home() {
   const handleStartChatting = () => {
-    console.log("Start Chatting clicked");
+    const roomId = generateRoomId();
+    window.location.href = `/chat/${roomId}`;
   };
 
   const handleLearnMore = () => {
@@ -17,9 +18,6 @@ export default function Home() {
   socket.onopen = () => {
     socket.send(JSON.stringify({ message: "Hello, server!", type: "message" }));
   };
-
-  const roomId = generateRoomId();
-  console.log(roomId);
 
   const floatingVariants: Variants = {
     initial: { y: 0 },
@@ -211,7 +209,7 @@ export default function Home() {
               <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <motion.button
                   onClick={handleStartChatting}
-                  className="bg-zinc-900 dark:bg-white text-white dark:text-black px-7 py-3.5 rounded-xl font-semibold text-sm md:text-base hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-all duration-300 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/20"
+                  className="bg-zinc-900 dark:bg-white cursor-pointer text-white dark:text-black px-7 py-3.5 rounded-xl font-semibold text-sm md:text-base hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-all duration-300 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -220,7 +218,7 @@ export default function Home() {
 
                 <motion.button
                   onClick={handleLearnMore}
-                  className="border-2 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white px-7 py-3.5 rounded-xl font-semibold text-sm md:text-base hover:bg-zinc-100 dark:hover:bg-zinc-900/50 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-300"
+                  className="border-2 border-zinc-300 dark:border-zinc-700 cursor-pointer text-zinc-800 dark:text-white px-7 py-3.5 rounded-xl font-semibold text-sm md:text-base hover:bg-zinc-100 dark:hover:bg-zinc-900/50 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

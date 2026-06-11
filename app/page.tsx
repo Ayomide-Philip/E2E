@@ -12,6 +12,11 @@ export default function Home() {
     console.log("Learn More clicked");
   };
 
+  const socket = new WebSocket("ws://localhost:3000");
+  socket.onopen = () => {
+    socket.send("Hello from the client!");
+  };
+
   const floatingVariants: Variants = {
     initial: { y: 0 },
     animate: {

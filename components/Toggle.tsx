@@ -6,7 +6,6 @@ export default function Toggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
   return (

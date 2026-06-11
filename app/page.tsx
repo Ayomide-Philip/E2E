@@ -20,14 +20,13 @@ export default function Home() {
     },
   };
 
-  const fadeInUp = {
+  const fadeInUp: Variants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
   return (
     <div className="h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden">
-      {/* Dot pattern overlay */}
       <div
         className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black"
         style={{
@@ -36,7 +35,6 @@ export default function Home() {
           backgroundSize: "40px 40px",
         }}
       />
-      {/* Dark mode dot pattern override via a separate absolutely-positioned layer */}
       <div
         className="absolute inset-0 hidden dark:block"
         style={{
@@ -77,7 +75,6 @@ export default function Home() {
       <div className="relative z-10 flex items-center justify-center h-[calc(100vh-73px)] px-4">
         <div className="max-w-5xl w-full">
           <div className="relative h-full min-h-0 flex items-center justify-center">
-            {/* Top-left floating card */}
             <motion.div
               className="hidden md:block absolute top-0 left-0 md:-left-8 lg:-left-12"
               initial="initial"
@@ -94,7 +91,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Top-right floating card */}
             <motion.div
               className="hidden md:block absolute top-0 right-0 md:-right-8 lg:-right-12"
               initial="initial"
@@ -121,7 +117,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Bottom-left floating card */}
             <motion.div
               className="hidden md:block absolute bottom-0 left-0 md:-left-6 lg:-left-10"
               initial="initial"
@@ -152,7 +147,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Bottom-right floating card */}
             <motion.div
               className="hidden md:block absolute bottom-0 right-0 md:-right-8 lg:-right-12"
               initial="initial"
@@ -169,7 +163,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Top-center icon */}
             <motion.div
               className="hidden md:block absolute -top-16 left-1/2 transform -translate-x-1/2"
               initial={{ opacity: 0, scale: 0 }}
@@ -184,7 +177,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Hero text */}
             <motion.div
               className="text-center relative z-20"
               initial="initial"

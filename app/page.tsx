@@ -12,9 +12,9 @@ export default function Home() {
     console.log("Learn More clicked");
   };
 
-  const socket = new WebSocket("ws://localhost:3000");
+  const socket = new WebSocket("ws://localhost:3000/api/ws");
   socket.onopen = () => {
-    socket.send("Hello from the client!");
+    socket.send(JSON.stringify({ message: "Hello, server!", type: "message" }));
   };
 
   const floatingVariants: Variants = {

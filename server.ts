@@ -2,6 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import { WebSocketServer, WebSocket } from "ws";
 import next from "next";
 import { parse } from "node:url";
+import { Socket } from "node:net";
 
 const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
@@ -12,7 +13,7 @@ app.prepare().then(() => {
     handle(req, res, parse(req.url || "", true));
   });
 
-  const wss: WebSocketServer = new WebSocketServer({ server });
+  const wss: WebSocketServer = new WebSocketServer({ noServer: true });
 
   wss.on("connection", (ws: WebSocket) => {
     console.log("WebSocket connection established");
@@ -23,6 +24,20 @@ app.prepare().then(() => {
     ws.on("close", () => {
       console.log("WebSocket connection closed");
     });
+  });
+
+  server.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {
+    const { pathname } = parse(req.url || "", true);
+
+    if (pathname === "/_next/webpack-hmr") {
+      app.getUpgradeHandler()(req, socket, head);
+    }
+
+    if (pathname === "/api/ws") {
+      wss.handleUpgrade(req, socket, head, (ws: WebSocket) => {
+        wss.emit("connection", ws, req);
+      });
+    }
   });
 
   server.listen(3000, () => {

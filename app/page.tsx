@@ -1,6 +1,7 @@
 "use client";
 
 import Toggle from "@/components/Toggle";
+import generateRoomId from "@/lib/generatingRoomId";
 import { motion, Variants } from "framer-motion";
 
 export default function Home() {
@@ -16,6 +17,9 @@ export default function Home() {
   socket.onopen = () => {
     socket.send(JSON.stringify({ message: "Hello, server!", type: "message" }));
   };
+
+  const roomId = generateRoomId();
+  console.log(roomId);
 
   const floatingVariants: Variants = {
     initial: { y: 0 },

@@ -1,5 +1,6 @@
 "use client";
 
+import Toggle from "@/components/Toggle";
 import { motion, Variants } from "framer-motion";
 
 export default function Home() {
@@ -53,6 +54,7 @@ export default function Home() {
           >
             Security
           </a>
+          <Toggle />
         </div>
 
         <button className="bg-white/95 text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-white transition-colors shadow-sm shadow-black/20">

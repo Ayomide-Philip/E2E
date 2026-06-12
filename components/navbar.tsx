@@ -1,3 +1,5 @@
+"use client";
+
 import Toggle from "@/components/Toggle";
 import { useRouter } from "next/navigation";
 export default function NavBar() {

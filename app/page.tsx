@@ -1,15 +1,12 @@
 "use client";
 
-import Toggle from "@/components/Toggle";
-import generateRoomId from "@/lib/generatingRoomId";
+import NavBar from "@/components/navbar";
 import { motion, Variants } from "framer-motion";
 import { Sparkles, Lock, Check, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  function handleStartChatting() {
-    const roomId = generateRoomId();
-    window.location.href = `/chat/${roomId}`;
-  }
+  const router = useRouter();
 
   function handleLearnMore() {
     console.log("Learn More clicked");
@@ -47,36 +44,7 @@ export default function Home() {
         }}
       />
 
-      <nav className="sticky top-4 z-50 mx-auto flex w-[calc(100%-2rem)] max-w-6xl items-center justify-between rounded-full px-6 py-4 md:px-8 bg-white/70 dark:bg-black/20 backdrop-blur-2xl border border-zinc-200 dark:border-white/10 shadow-[0_12px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_35px_rgba(0,0,0,0.22)]">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-zinc-900 dark:text-white">
-            Private
-          </span>
-        </div>
-
-        <div className="hidden md:flex items-center gap-8">
-          <a
-            href="#"
-            className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
-          >
-            How It Works
-          </a>
-          <a
-            href="#"
-            className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
-          >
-            Security
-          </a>
-          <Toggle />
-        </div>
-
-        <button
-          onClick={handleStartChatting}
-          className="bg-zinc-900 dark:bg-white/95 text-white dark:text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-zinc-700 dark:hover:bg-white transition-colors shadow-sm shadow-black/20"
-        >
-          Start Chat
-        </button>
-      </nav>
+      <NavBar />
 
       <div className="relative z-10 flex items-center justify-center h-[calc(100vh-73px)] px-4">
         <div className="max-w-5xl w-full">
@@ -211,7 +179,7 @@ export default function Home() {
 
               <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <motion.button
-                  onClick={handleStartChatting}
+                  onClick={() => router.push("/chat")}
                   className="bg-zinc-900 dark:bg-white cursor-pointer text-white dark:text-black px-7 py-3.5 rounded-xl font-semibold text-sm md:text-base hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-all duration-300 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

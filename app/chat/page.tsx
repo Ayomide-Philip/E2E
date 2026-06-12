@@ -1,0 +1,137 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Plus, ArrowRight, Lock, Sparkles } from "lucide-react";
+import Toggle from "@/components/Toggle";
+import generateRoomId from "@/lib/generatingRoomId";
+import Link from "next/link";
+import NavBar from "@/components/navbar";
+
+export default function ChatLandingPage() {
+  const [roomIdInput, setRoomIdInput] = useState("");
+  const router = useRouter();
+
+  const handleCreateRoom = () => {
+    const newRoomId = generateRoomId();
+    router.push(`/chat/${newRoomId}`);
+  };
+
+  const extractRoomId = (input: string) => {
+    const cleanInput = input.trim();
+    if (!cleanInput) return "";
+    try {
+      // Check if the input is a valid URL
+      const url = new URL(cleanInput);
+      const parts = url.pathname.split("/");
+      const id = parts[parts.length - 1];
+      return id || cleanInput;
+    } catch (e) {
+      // Not a URL, return raw string
+      return cleanInput;
+    }
+  };
+
+  const handleJoinRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanRoomId = extractRoomId(roomIdInput);
+    if (cleanRoomId) {
+      router.push(`/chat/${cleanRoomId}`);
+    }
+  };
+
+  return (
+    <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
+      <div
+        className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #d4d4d8 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      <div
+        className="absolute inset-0 hidden dark:block pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #27272a 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <NavBar />
+
+      <div className="relative z-10 flex-1 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm rounded-3xl p-6 md:p-8 max-w-md w-full border border-zinc-200 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none"
+        >
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25 text-white mx-auto mb-4">
+              <Lock className="h-5 w-5" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
+              Secure Chat Rooms
+            </h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed">
+              Create a new ephemeral room, or enter a room link or identifier to
+              connect with a peer securely.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <button
+                onClick={handleCreateRoom}
+                className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black h-12 rounded-xl font-semibold text-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Create New Room</span>
+              </button>
+              <div className="text-[10px] text-center text-zinc-400 dark:text-zinc-500 flex items-center justify-center gap-1">
+                <Sparkles className="h-3 w-3 shrink-0" />
+                <span>Generates a unique encrypted session link</span>
+              </div>
+            </div>
+
+            <div className="relative flex py-1 items-center">
+              <div className="grow border-t border-zinc-200 dark:border-zinc-800/80"></div>
+              <span className="shrink mx-4 text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider">
+                or
+              </span>
+              <div className="grow border-t border-zinc-200 dark:border-zinc-800/80"></div>
+            </div>
+
+            <form onSubmit={handleJoinRoom} className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider mb-2">
+                  Join Existing Room
+                </label>
+                <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-850 rounded-xl p-1.5 shadow-xs focus-within:border-zinc-350 dark:focus-within:border-zinc-750 transition-colors">
+                  <input
+                    type="text"
+                    required
+                    value={roomIdInput}
+                    onChange={(e) => setRoomIdInput(e.target.value)}
+                    placeholder="Enter Room ID or URL link..."
+                    className="flex-1 text-xs px-2 bg-transparent text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!roomIdInput.trim()}
+                    className="h-9 w-9 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

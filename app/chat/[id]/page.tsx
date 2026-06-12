@@ -1,4 +1,8 @@
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const socket = new WebSocket("ws://localhost:3000/api/ws");
   socket.onopen = () => {

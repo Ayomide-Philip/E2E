@@ -36,6 +36,14 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           setIsPartnerJoined(true);
         }
       }
+
+      if (data?.type === "peer-left") {
+        toast.success("Your chat partner has left the room.", {
+          description: "Waiting for another peer to join...",
+        });
+        setIsPartnerJoined(false);
+        setTotalUser(data?.count || 0);
+      }
     };
   }, [roomId]);
 
@@ -100,7 +108,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       sender: "partner",
       time: "1:44 PM",
     },
-  ];  
+  ];
 
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">

@@ -64,6 +64,16 @@ app.prepare().then(() => {
 
       if (roomId && rooms[roomId]) {
         rooms[roomId].delete(ws);
+        for (const client of rooms[roomId]) {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "peer-left",
+                count: rooms[roomId].size,
+              }),
+            );
+          }
+        }
       }
 
       if (rooms[roomId].size === 0) {

@@ -29,6 +29,17 @@ app.prepare().then(() => {
           rooms[roomId] = new Set();
         }
 
+        if (rooms[roomId].size >= 2) {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              message: "Room is full",
+            }),
+          );
+          ws.close();
+          return;
+        }
+
         rooms[roomId].add(ws);
         clientsRoom.set(ws, roomId);
         console.log(`Room ${roomId}:`, rooms[roomId].size);

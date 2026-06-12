@@ -13,7 +13,12 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [isPartnerJoined, setIsPartnerJoined] = useState(false);
   const [createdTime, setCreatedTime] = useState("");
   const [totalUser, setTotalUser] = useState(0);
+  const [messages, setMessages] = useState<
+    Array<{ text: string; sender: string; time: string }>
+  >([]);
+  const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<WebSocket | null>(null);
 
   const handleCopy = async () => {
     try {
@@ -25,15 +30,40 @@ export function ChatRoom({ roomId }: { roomId: string }) {
     }
   };
 
-  useEffect(() => {
-    const socket = new WebSocket(`ws://localhost:3000/api/ws`);
+  function handleSendMessage() {
+    if (!inputMessage.trim() || !isPartnerJoined) return;
 
-    socket.onopen = () => {
+    socketRef.current?.send(
+      JSON.stringify({
+        data: inputMessage.trim(),
+        type: "message",
+      }),
+    );
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        text: inputMessage.trim(),
+        sender: "me",
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
+
+    setInputMessage("");
+  }
+
+  useEffect(() => {
+    socketRef.current = new WebSocket(`ws://localhost:3000/api/ws`);
+
+    socketRef.current.onopen = () => {
       console.log("WebSocket connection opened");
-      socket.send(JSON.stringify({ type: "join", roomId }));
+      socketRef.current?.send(JSON.stringify({ type: "join", roomId }));
     };
 
-    socket.onmessage = (event: MessageEvent) => {
+    socketRef.current.onmessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data.toString());
       console.log("Received message:", data);
       if (data?.type === "peer-joined") {
@@ -52,6 +82,20 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         });
         setIsPartnerJoined(false);
         setTotalUser(data?.count || 0);
+      }
+
+      if (data?.type === "message") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: data?.data,
+            sender: "partner",
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ]);
       }
     };
   }, [roomId]);
@@ -267,11 +311,11 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                     }}
                     className="flex flex-col gap-4"
                   >
-                    {sampleMessages.map((msg) => {
+                    {messages.map((msg, idx) => {
                       const isMe = msg.sender === "me";
                       return (
                         <motion.div
-                          key={msg.id}
+                          key={idx}
                           variants={{
                             hidden: { opacity: 0, y: 10 },
                             show: { opacity: 1, y: 0 },
@@ -307,12 +351,14 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                     <input
                       type="text"
                       placeholder="Secure connection active. Send encrypted message..."
-                      disabled
-                      className="flex-1 px-4 py-2.5 text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 cursor-not-allowed"
+                      disabled={!isPartnerJoined}
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      className="flex-1 px-4 py-2.5 text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 cursor-pointer"
                     />
                     <button
-                      disabled
-                      className="bg-zinc-900 dark:bg-white text-white dark:text-black h-10 px-5 rounded-xl font-semibold text-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors cursor-not-allowed opacity-50 flex items-center gap-1.5"
+                      onClick={handleSendMessage}
+                      className="bg-zinc-900 dark:bg-white text-white dark:text-black h-10 px-5 rounded-xl font-semibold text-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors cursor-pointer opacity-50 flex items-center gap-1.5"
                     >
                       <Send className="h-4 w-4" />
                       <span className="hidden sm:inline">Send</span>

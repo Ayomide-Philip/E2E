@@ -54,6 +54,20 @@ app.prepare().then(() => {
           }
         }
         console.log(`Room ${roomId}:`, rooms[roomId].size);
+      } else if (m?.type === "message") {
+        const roomId = clientsRoom.get(ws);
+        if (!roomId) return;
+
+        for (const client of rooms[roomId]) {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "message",
+                data: m.data,
+              }),
+            );
+          }
+        }
       }
     });
 

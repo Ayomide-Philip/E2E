@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Copy, Check, Send, Shield, ArrowLeft } from "lucide-react";
 import Toggle from "@/components/Toggle";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export function ChatRoom({ roomId }: { roomId: string }) {
   const [roomLink, setRoomLink] = useState("");
@@ -20,6 +21,17 @@ export function ChatRoom({ roomId }: { roomId: string }) {
     socket.onopen = () => {
       console.log("WebSocket connection opened");
       socket.send(JSON.stringify({ type: "join", roomId }));
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      const data = JSON.parse(event.data.toString());
+      console.log("Received message:", data);
+      if (data?.type === "peer-joined") {
+        toast.success(
+          "A peer has joined the room! You can start chatting securely.",
+        );
+        setIsPartnerJoined(true);
+      }
     };
   }, [roomId]);
 
@@ -88,7 +100,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
-      {/* Grid backgrounds */}
       <div
         className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black pointer-events-none"
         style={{
@@ -106,10 +117,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         }}
       />
 
-      {/* Sticky Top Header */}
       <header className="relative z-20 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-black/20 backdrop-blur-2xl px-4 py-3 shrink-0">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          {/* Brand Logo & Back Option */}
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -128,9 +137,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
             </div>
           </div>
 
-          {/* Room details & status (Tablet/Desktop) */}
           <div className="hidden sm:flex items-center gap-3">
-            {/* Room ID Badge */}
             <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-900/60 text-zinc-650 dark:text-zinc-350 text-xs font-mono rounded-full border border-zinc-200/85 dark:border-zinc-800/80">
               <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-650" />
               <span className="truncate max-w-28" title={roomId}>

@@ -4,9 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, ArrowRight, Lock, Sparkles } from "lucide-react";
-import Toggle from "@/components/Toggle";
 import generateRoomId from "@/lib/generatingRoomId";
-import Link from "next/link";
 import NavBar from "@/components/navbar";
 
 export default function ChatLandingPage() {
@@ -18,27 +16,9 @@ export default function ChatLandingPage() {
     router.push(`/chat/${newRoomId}`);
   };
 
-  const extractRoomId = (input: string) => {
-    const cleanInput = input.trim();
-    if (!cleanInput) return "";
-    try {
-      // Check if the input is a valid URL
-      const url = new URL(cleanInput);
-      const parts = url.pathname.split("/");
-      const id = parts[parts.length - 1];
-      return id || cleanInput;
-    } catch (e) {
-      // Not a URL, return raw string
-      return cleanInput;
-    }
-  };
-
   const handleJoinRoom = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanRoomId = extractRoomId(roomIdInput);
-    if (cleanRoomId) {
-      router.push(`/chat/${cleanRoomId}`);
-    }
+    router.push(`/chat/${roomIdInput.trim()} `);
   };
 
   return (
@@ -116,7 +96,7 @@ export default function ChatLandingPage() {
                     required
                     value={roomIdInput}
                     onChange={(e) => setRoomIdInput(e.target.value)}
-                    placeholder="Enter Room ID or URL link..."
+                    placeholder="Enter Room ID"
                     className="flex-1 text-xs px-2 bg-transparent text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none"
                   />
                   <button

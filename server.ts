@@ -42,6 +42,16 @@ app.prepare().then(() => {
 
         rooms[roomId].add(ws);
         clientsRoom.set(ws, roomId);
+
+        for (const client of rooms[roomId]) {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "peer-joined",
+              }),
+            );
+          }
+        }
         console.log(`Room ${roomId}:`, rooms[roomId].size);
       }
     });

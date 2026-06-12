@@ -16,6 +16,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [isPartnerJoined, setIsPartnerJoined] = useState(false);
   const [createdTime, setCreatedTime] = useState("");
   const [totalUser, setTotalUser] = useState(0);
+  const [partnerPublicKey, setPartnerPublicKey] = useState<string | null>(null);
   const [keys, setKeys] = useState<{
     privateKey: CryptoKey;
     publicKey: string;
@@ -63,11 +64,14 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   }
 
   useEffect(() => {
+    if (!keys) return;
     socketRef.current = new WebSocket(`ws://localhost:3000/api/ws`);
 
     socketRef.current.onopen = () => {
       console.log("WebSocket connection opened");
-      socketRef.current?.send(JSON.stringify({ type: "join", roomId }));
+      socketRef.current?.send(
+        JSON.stringify({ type: "join", roomId, publicKey: keys?.publicKey }),
+      );
     };
 
     socketRef.current.onmessage = (event: MessageEvent) => {
@@ -104,6 +108,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           },
         ]);
       }
+
+      if (data?.type === "peer-public-key") {
+        setPartnerPublicKey(data?.publicKey);
+      }
     };
   }, [roomId, keys]);
 
@@ -113,6 +121,12 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       setKeys(keys);
     }
     generateKeyValue();
+
+    const time = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setCreatedTime(`Today at ${time}`);
   }, []);
 
   useEffect(() => {
@@ -120,14 +134,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       setRoomLink(`${window.location.origin}/chat/${roomId}`);
     }
   }, [roomId]);
-
-  useEffect(() => {
-    const time = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    setCreatedTime(`Today at ${time}`);
-  }, []);
 
   useEffect(() => {
     if (isPartnerJoined) {

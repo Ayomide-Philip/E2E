@@ -8,6 +8,7 @@ const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
 const rooms: Record<string, Set<WebSocket>> = {};
 const clientsRoom = new Map<WebSocket, string>();
+const clientsPublicKeys = new Map<WebSocket, string>();
 
 app.prepare().then(() => {
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -23,7 +24,7 @@ app.prepare().then(() => {
 
       console.log("Received message:", m);
       if (m?.type === "join") {
-        const { roomId } = m;
+        const { roomId, publicKey } = m;
 
         if (!rooms[roomId]) {
           rooms[roomId] = new Set();
@@ -38,6 +39,36 @@ app.prepare().then(() => {
           );
           ws.close();
           return;
+        }
+
+        if (publicKey) {
+          clientsPublicKeys.set(ws, publicKey);
+        }
+
+        if (rooms[roomId].size === 2) {
+          const [client1, client2] = [...rooms[roomId]];
+          const publicKey1 = clientsPublicKeys.get(client1);
+          const publicKey2 = clientsPublicKeys.get(client2);
+
+          if (publicKey1 && publicKey2) {
+            if (publicKey1 && client1.readyState === WebSocket.OPEN) {
+              client1.send(
+                JSON.stringify({
+                  type: "peer-public-key",
+                  publicKey: publicKey2,
+                }),
+              );
+            }
+
+            if (publicKey2 && client2.readyState === WebSocket.OPEN) {
+              client2.send(
+                JSON.stringify({
+                  type: "peer-public-key",
+                  publicKey: publicKey1,
+                }),
+              );
+            }
+          }
         }
 
         rooms[roomId].add(ws);

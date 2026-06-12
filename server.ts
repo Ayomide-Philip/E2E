@@ -18,11 +18,9 @@ app.prepare().then(() => {
   const wss: WebSocketServer = new WebSocketServer({ noServer: true });
 
   wss.on("connection", (ws: WebSocket) => {
-    console.log("WebSocket connection established");
     ws.on("message", (message: string) => {
       const m = JSON.parse(message.toString());
 
-      console.log("Received message:", m);
       if (m?.type === "join") {
         const { roomId, publicKey } = m;
 
@@ -83,7 +81,6 @@ app.prepare().then(() => {
             );
           }
         }
-        console.log(`Room ${roomId}:`, rooms[roomId].size);
       } else if (m?.type === "message") {
         const roomId = clientsRoom.get(ws);
         if (!roomId) return;

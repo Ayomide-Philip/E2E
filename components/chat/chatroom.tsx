@@ -89,8 +89,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   }, [keys, partnerPublicKey]);
 
   useEffect(() => {
-    if (!keys) return;
-    socketRef.current = new WebSocket(`ws://localhost:3000/api/ws`);
+    if (!keys || !window) return;
+    socketRef.current = new WebSocket(`ws://${window.location.host}/api/ws`);
 
     socketRef.current.onopen = () => {
       console.log("WebSocket connection opened");
@@ -101,7 +101,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
     socketRef.current.onmessage = async (event: MessageEvent) => {
       const data = JSON.parse(event.data.toString());
-      console.log("Received message:", data);
       if (data?.type === "peer-joined") {
         toast.success(
           "A peer has joined the room! You can start chatting securely.",

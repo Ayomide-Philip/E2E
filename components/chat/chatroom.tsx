@@ -8,7 +8,11 @@ import ChatNavBar from "./navbar";
 import WaitingChatRoom from "./waitingChatRoom";
 import ChatRoomActive from "./chatRoomActive";
 import ChatRoomInformation from "./chatRoomInformation";
-import { generateKeysValuePairs } from "@/lib/crypto";
+import {
+  encryptMessage,
+  generateKeysValuePairs,
+  getEncryptionKey,
+} from "@/lib/crypto";
 
 export function ChatRoom({ roomId }: { roomId: string }) {
   const [roomLink, setRoomLink] = useState("");
@@ -17,6 +21,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [createdTime, setCreatedTime] = useState("");
   const [totalUser, setTotalUser] = useState(0);
   const [partnerPublicKey, setPartnerPublicKey] = useState<string | null>(null);
+  const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
   const [keys, setKeys] = useState<{
     privateKey: CryptoKey;
     publicKey: string;
@@ -38,13 +43,16 @@ export function ChatRoom({ roomId }: { roomId: string }) {
     }
   };
 
-  function handleSendMessage() {
+  async function handleSendMessage() {
     if (!inputMessage.trim() || !isPartnerJoined) return;
-
+    if (!encryptionKey)
+      return toast.error(
+        "Encryption key is not ready yet. Please wait a moment.",
+      );
     socketRef.current?.send(
       JSON.stringify({
-        data: inputMessage.trim(),
         type: "message",
+        ...(await encryptMessage(encryptionKey!, inputMessage.trim())),
       }),
     );
 
@@ -62,6 +70,19 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
     setInputMessage("");
   }
+
+  useEffect(() => {
+    async function deriveEncryptionKey() {
+      if (keys && partnerPublicKey) {
+        const sharedKey = await getEncryptionKey(
+          keys.privateKey,
+          partnerPublicKey,
+        );
+        setEncryptionKey(sharedKey);
+      }
+    }
+    deriveEncryptionKey();
+  }, [keys, partnerPublicKey]);
 
   useEffect(() => {
     if (!keys) return;
@@ -99,7 +120,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         setMessages((prev) => [
           ...prev,
           {
-            text: data?.data,
+            text: data?.ciphertext || "",
             sender: "partner",
             time: new Date().toLocaleTimeString([], {
               hour: "2-digit",

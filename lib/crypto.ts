@@ -22,7 +22,7 @@ export async function generateKeysValuePairs() {
   };
 }
 
-export async function deriveSharedSecret(
+export async function getEncryptionKey(
   privateKey: CryptoKey,
   publicKey: string,
 ) {
@@ -56,4 +56,47 @@ export async function deriveSharedSecret(
   );
 
   return sharedSecret;
+}
+
+export async function encryptMessage(aesKey: CryptoKey, message: string) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encodedMessage = new TextEncoder().encode(message);
+
+  const cipherText = await crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
+    aesKey,
+    encodedMessage,
+  );
+
+  const ivBase64 = btoa(String.fromCharCode(...iv));
+  const cipherTextBase64 = btoa(
+    String.fromCharCode(...new Uint8Array(cipherText)),
+  );
+
+  return { iv: ivBase64, cipherText: cipherTextBase64 };
+}
+
+export async function decryptMessage(
+  aesKey: CryptoKey,
+  iv: string,
+  cipherText: string,
+) {
+  const ivArray = Uint8Array.from(atob(iv), (c) => c.charCodeAt(0));
+  const cipherTextArray = Uint8Array.from(atob(cipherText), (c) =>
+    c.charCodeAt(0),
+  );
+
+  const decrypted = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: ivArray,
+    },
+    aesKey,
+    cipherTextArray,
+  );
+
+  return new TextDecoder().decode(decrypted);
 }

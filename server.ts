@@ -40,6 +40,8 @@ app.prepare().then(() => {
           ws.close();
           return;
         }
+        rooms[roomId].add(ws);
+        clientsRoom.set(ws, roomId);
 
         if (publicKey) {
           clientsPublicKeys.set(ws, publicKey);
@@ -71,9 +73,6 @@ app.prepare().then(() => {
           }
         }
 
-        rooms[roomId].add(ws);
-        clientsRoom.set(ws, roomId);
-
         for (const client of rooms[roomId]) {
           if (client.readyState === WebSocket.OPEN) {
             client.send(
@@ -94,7 +93,7 @@ app.prepare().then(() => {
             client.send(
               JSON.stringify({
                 type: "message",
-                data: m.data,
+                ...m,
               }),
             );
           }

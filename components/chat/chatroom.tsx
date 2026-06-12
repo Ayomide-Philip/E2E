@@ -100,7 +100,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       sender: "partner",
       time: "1:44 PM",
     },
-  ];
+  ];  
 
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
@@ -149,7 +149,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
               </span>
             </div>
 
-            {/* Status Badge */}
             <div
               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                 isPartnerJoined
@@ -166,22 +165,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
             </div>
           </div>
 
-          {/* Action buttons (Header Actions) */}
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Simulator Toggle */}
-            <button
-              onClick={() => setIsPartnerJoined(!isPartnerJoined)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer shadow-xs ${
-                isPartnerJoined
-                  ? "bg-emerald-500/15 text-emerald-800 border-emerald-300 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-800 hover:bg-emerald-500/20"
-                  : "bg-amber-500/15 text-amber-800 border-amber-300 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-800 hover:bg-amber-500/20"
-              }`}
-              title="Simulate peer connection for testing"
-            >
-              <span>Simulate Join</span>
-            </button>
-
-            {/* Quick Copy Link Button */}
             <button
               onClick={handleCopy}
               className={`p-2 rounded-full border transition-all cursor-pointer ${
@@ -198,7 +182,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
               )}
             </button>
 
-            {/* Dark Mode Toggle */}
             <div className="p-2 rounded-full border bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-350 hover:bg-zinc-100 dark:hover:bg-zinc-850 transition-all flex items-center justify-center">
               <Toggle />
             </div>
@@ -206,13 +189,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         </div>
       </header>
 
-      {/* Main Container */}
       <main className="relative z-10 flex-1 flex overflow-hidden w-full max-w-6xl mx-auto p-4 md:p-6 min-h-0">
-        {/* Animated Views Container */}
         <div className="flex-1 flex flex-col min-w-0 bg-white/70 dark:bg-zinc-950/20 backdrop-blur-md rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none overflow-hidden">
           <AnimatePresence mode="wait">
             {!isPartnerJoined ? (
-              /* Waiting State View */
               <motion.div
                 key="waiting"
                 initial={{ opacity: 0, y: 15 }}
@@ -221,7 +201,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 transition={{ duration: 0.3 }}
                 className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 text-center"
               >
-                {/* Visual Illustration */}
                 <div className="relative w-36 h-36 mx-auto mb-6 flex items-center justify-center">
                   <motion.div
                     animate={{
@@ -268,7 +247,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                   </motion.div>
                 </div>
 
-                {/* Text Context */}
                 <h2 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight mb-2">
                   Waiting for someone to join...
                 </h2>
@@ -277,7 +255,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                   remains temporary and encrypted.
                 </p>
 
-                {/* Room Link Card */}
                 <div className="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-4 w-full max-w-md text-left shadow-xs">
                   <span className="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">
                     Shareable Room Link
@@ -313,7 +290,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 </div>
               </motion.div>
             ) : (
-              /* Active Chat Layout */
               <motion.div
                 key="chat"
                 initial={{ opacity: 0 }}
@@ -322,9 +298,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 transition={{ duration: 0.3 }}
                 className="flex-1 flex flex-col min-h-0"
               >
-                {/* Scrollable Message Box */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-                  {/* Encryption Notification Banner */}
                   <div className="flex items-center justify-center mb-6">
                     <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 dark:bg-emerald-400/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl text-xs max-w-md text-center shadow-xs">
                       <Shield className="h-3.5 w-3.5 shrink-0" />
@@ -335,7 +309,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                     </div>
                   </div>
 
-                  {/* Message Bubbles Container */}
                   <motion.div
                     initial="hidden"
                     animate="show"
@@ -383,7 +356,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Sticky Bottom Input Area */}
                 <div className="p-4 md:p-6 bg-linear-to-t from-white/95 via-white/50 to-transparent dark:from-zinc-950/95 dark:via-zinc-950/50 dark:to-transparent shrink-0 border-t border-zinc-200/80 dark:border-zinc-800/60">
                   <div className="flex items-center gap-2 max-w-4xl mx-auto bg-white dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none p-1.5">
                     <input
@@ -406,10 +378,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           </AnimatePresence>
         </div>
 
-        {/* Sidebar Info Panel (Desktop Only) */}
         <aside className="hidden md:flex flex-col w-72 shrink-0 pl-6 h-full min-h-0">
           <div className="bg-white/70 dark:bg-zinc-950/20 backdrop-blur-md rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none p-5 flex-1 flex flex-col justify-between">
-            {/* Top Section: Room Parameters */}
             <div className="space-y-4">
               <h3 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                 Room Parameters
@@ -475,7 +445,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
               </div>
             </div>
 
-            {/* Middle Section: Encryption details */}
             <div className="bg-emerald-500/10 dark:bg-emerald-400/5 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl p-3 flex items-start gap-2.5 my-3 shrink-0">
               <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <div className="min-w-0">
@@ -488,7 +457,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
               </div>
             </div>
 
-            {/* Bottom Section: Expiration helper */}
             <div className="bg-zinc-100/50 dark:bg-zinc-900/10 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-3 shrink-0">
               <span className="text-[9px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                 Session Expiration

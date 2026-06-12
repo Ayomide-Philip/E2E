@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -12,8 +14,10 @@ export default function Page() {
 }
 
 export function ChatRoom({ roomId }: { roomId: string }) {
-  const roomLink = `${window.location.origin}/chat/${roomId}`;
-
+  const [roomLink, setRoomLink] = useState("");
+  useEffect(() => {
+    setRoomLink(`${window.location.origin}/chat/${roomId}`);
+  }, [roomId]);
   return (
     <div className="flex flex-col h-screen bg-zinc-950 text-zinc-100">
       <header className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-900 shrink-0">

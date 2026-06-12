@@ -120,7 +120,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         setMessages((prev) => [
           ...prev,
           {
-            text: data?.ciphertext || "",
+            text: data?.cipherText || "",
             sender: "partner",
             time: new Date().toLocaleTimeString([], {
               hour: "2-digit",

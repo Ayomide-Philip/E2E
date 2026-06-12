@@ -81,19 +81,30 @@ export default function ChatRoomActive({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 md:p-6 bg-linear-to-t from-white/95 via-white/50 to-transparent dark:from-zinc-950/95 dark:via-zinc-950/50 dark:to-transparent shrink-0 border-t border-zinc-200/80 dark:border-zinc-800/60">
-        <div className="flex items-center gap-2 max-w-4xl mx-auto bg-white dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none p-1.5">
+      <div className="p-3 md:p-4 bg-linear-to-t from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 dark:to-transparent shrink-0 border-t border-zinc-200/80 dark:border-zinc-800/60">
+        <div className="flex items-center gap-2 max-w-4xl mx-auto bg-white dark:bg-zinc-900 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_4px_20px_rgb(0,0,0,0.04)] dark:shadow-none p-1.5">
           <input
             type="text"
-            placeholder="Secure connection active. Send encrypted message..."
+            placeholder="Type a message..."
             disabled={!isPartnerJoined}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            className="flex-1 px-4 py-2.5 text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 cursor-pointer"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey && inputMessage.trim()) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            className="flex-1 px-4 py-2.5 text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 cursor-text disabled:cursor-not-allowed"
           />
           <button
             onClick={handleSendMessage}
-            className="bg-zinc-900 dark:bg-white text-white dark:text-black h-10 px-5 rounded-xl font-semibold text-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors cursor-pointer opacity-50 flex items-center gap-1.5"
+            disabled={!inputMessage.trim() || !isPartnerJoined}
+            className={`h-10 px-4 rounded-xl font-semibold text-sm transition-all flex items-center gap-1.5 shrink-0 ${
+              inputMessage.trim() && isPartnerJoined
+                ? "bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-700 dark:hover:bg-zinc-100 cursor-pointer shadow-sm"
+                : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed opacity-60"
+            }`}
           >
             <Send className="h-4 w-4" />
             <span className="hidden sm:inline">Send</span>

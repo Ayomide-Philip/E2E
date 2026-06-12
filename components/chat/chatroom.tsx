@@ -14,12 +14,14 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [createdTime, setCreatedTime] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const socket = new WebSocket(`ws://localhost:3000/api/ws`);
+  useEffect(() => {
+    const socket = new WebSocket(`ws://localhost:3000/api/ws`);
 
-  socket.onopen = () => {
-    console.log("WebSocket connection opened");
-    socket.send(JSON.stringify({ type: "join", roomId }));
-  };
+    socket.onopen = () => {
+      console.log("WebSocket connection opened");
+      socket.send(JSON.stringify({ type: "join", roomId }));
+    };
+  }, [roomId]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

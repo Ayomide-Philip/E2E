@@ -6,8 +6,8 @@ import { Socket } from "node:net";
 
 const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
-// const clients: Set<WebSocket> = new Set();
 const rooms: Record<string, Set<WebSocket>> = {};
+const clientsRoom = new Map<WebSocket, string>();
 
 app.prepare().then(() => {
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -30,11 +30,25 @@ app.prepare().then(() => {
         }
 
         rooms[roomId].add(ws);
+        clientsRoom.set(ws, roomId);
         console.log(`Room ${roomId}:`, rooms[roomId].size);
       }
     });
 
     ws.on("close", () => {
+      const roomId = clientsRoom.get(ws);
+
+      if (!roomId) return;
+
+      if (roomId && rooms[roomId]) {
+        rooms[roomId].delete(ws);
+      }
+
+      if (rooms[roomId].size === 0) {
+        delete rooms[roomId];
+      }
+
+      clientsRoom.delete(ws);
       console.log("WebSocket connection closed");
     });
   });

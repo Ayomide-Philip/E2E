@@ -13,6 +13,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [copied, setCopied] = useState(false);
   const [isPartnerJoined, setIsPartnerJoined] = useState(false);
   const [createdTime, setCreatedTime] = useState("");
+  const [totalUser, setTotalUser] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,7 +31,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         toast.success(
           "A peer has joined the room! You can start chatting securely.",
         );
-        setIsPartnerJoined(true);
+        setTotalUser(data?.count || 0);
+        if (data?.count === 2) {
+          setIsPartnerJoined(true);
+        }
       }
     };
   }, [roomId]);
@@ -443,7 +447,9 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs font-semibold text-zinc-850 dark:text-zinc-200">
-                      {isPartnerJoined ? "2 / 2 Connected" : "1 / 2 Connected"}
+                      {isPartnerJoined
+                        ? `${totalUser} / 2 Connected`
+                        : `${totalUser}/2 Connected`}
                     </span>
                     <span className="flex h-2 w-2 relative">
                       <span

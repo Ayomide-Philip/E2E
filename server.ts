@@ -44,10 +44,11 @@ app.prepare().then(() => {
         clientsRoom.set(ws, roomId);
 
         for (const client of rooms[roomId]) {
-          if (client !== ws && client.readyState === WebSocket.OPEN) {
+          if (client.readyState === WebSocket.OPEN) {
             client.send(
               JSON.stringify({
                 type: "peer-joined",
+                count: rooms[roomId].size,
               }),
             );
           }

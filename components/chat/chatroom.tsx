@@ -122,39 +122,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
     }
   }, [isPartnerJoined]);
 
-  // const sampleMessages = [
-  //   {
-  //     id: 1,
-  //     text: "Hey! Just joined the room. Is this connection secure?",
-  //     sender: "partner",
-  //     time: "1:42 PM",
-  //   },
-  //   {
-  //     id: 2,
-  //     text: "Yes, it's end-to-end encrypted using Web Cryptography API. Keys are generated locally and never leave our devices.",
-  //     sender: "me",
-  //     time: "1:42 PM",
-  //   },
-  //   {
-  //     id: 3,
-  //     text: "That's awesome. Where are the messages stored?",
-  //     sender: "partner",
-  //     time: "1:43 PM",
-  //   },
-  //   {
-  //     id: 4,
-  //     text: "Nowhere! Everything is routed through memory via WebSockets and deleted automatically as soon as the session ends.",
-  //     sender: "me",
-  //     time: "1:43 PM",
-  //   },
-  //   {
-  //     id: 5,
-  //     text: "Perfect, no logs left behind! Let's start chatting here.",
-  //     sender: "partner",
-  //     time: "1:44 PM",
-  //   },
-  // ];
-
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
       <div

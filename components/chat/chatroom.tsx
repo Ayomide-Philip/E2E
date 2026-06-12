@@ -12,6 +12,7 @@ import {
   encryptMessage,
   generateKeysValuePairs,
   getEncryptionKey,
+  decryptMessage,
 } from "@/lib/crypto";
 
 export function ChatRoom({ roomId }: { roomId: string }) {
@@ -21,7 +22,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [createdTime, setCreatedTime] = useState("");
   const [totalUser, setTotalUser] = useState(0);
   const [partnerPublicKey, setPartnerPublicKey] = useState<string | null>(null);
-  const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
+  const encryptionKeyRef = useRef<CryptoKey | null>(null);
   const [keys, setKeys] = useState<{
     privateKey: CryptoKey;
     publicKey: string;
@@ -45,14 +46,17 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
   async function handleSendMessage() {
     if (!inputMessage.trim() || !isPartnerJoined) return;
-    if (!encryptionKey)
+    if (!encryptionKeyRef.current)
       return toast.error(
         "Encryption key is not ready yet. Please wait a moment.",
       );
     socketRef.current?.send(
       JSON.stringify({
         type: "message",
-        ...(await encryptMessage(encryptionKey!, inputMessage.trim())),
+        ...(await encryptMessage(
+          encryptionKeyRef.current,
+          inputMessage.trim(),
+        )),
       }),
     );
 
@@ -78,7 +82,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           keys.privateKey,
           partnerPublicKey,
         );
-        setEncryptionKey(sharedKey);
+        encryptionKeyRef.current = sharedKey;
       }
     }
     deriveEncryptionKey();
@@ -95,7 +99,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       );
     };
 
-    socketRef.current.onmessage = (event: MessageEvent) => {
+    socketRef.current.onmessage = async (event: MessageEvent) => {
       const data = JSON.parse(event.data.toString());
       console.log("Received message:", data);
       if (data?.type === "peer-joined") {
@@ -117,17 +121,27 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       }
 
       if (data?.type === "message") {
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: data?.cipherText || "",
-            sender: "partner",
-            time: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ]);
+        if (!encryptionKeyRef.current) return;
+        try {
+          const decryptedMessage = await decryptMessage(
+            encryptionKeyRef.current,
+            data?.iv,
+            data?.cipherText,
+          );
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: decryptedMessage,
+              sender: "partner",
+              time: new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+            },
+          ]);
+        } catch (err) {
+          console.log("Failed to decrypt message", err);
+        }
       }
 
       if (data?.type === "peer-public-key") {

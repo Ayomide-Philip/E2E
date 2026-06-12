@@ -3,14 +3,15 @@
 import Toggle from "@/components/Toggle";
 import generateRoomId from "@/lib/generatingRoomId";
 import { motion, Variants } from "framer-motion";
+import { Sparkles, Lock, Check, Trash2 } from "lucide-react";
 
 export default function Home() {
-  const handleStartChatting = () => {
+  function handleStartChatting() {
     const roomId = generateRoomId();
     window.location.href = `/chat/${roomId}`;
   };
 
-  const handleLearnMore = () => {
+  function handleLearnMore() {
     console.log("Learn More clicked");
   };
 
@@ -69,7 +70,7 @@ export default function Home() {
           <Toggle />
         </div>
 
-        <button className="bg-zinc-900 dark:bg-white/95 text-white dark:text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-zinc-700 dark:hover:bg-white transition-colors shadow-sm shadow-black/20">
+        <button onClick={handleStartChatting} className="bg-zinc-900 dark:bg-white/95 text-white dark:text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-zinc-700 dark:hover:bg-white transition-colors shadow-sm shadow-black/20">
           Start Chat
         </button>
       </nav>
@@ -84,8 +85,9 @@ export default function Home() {
               variants={floatingVariants}
             >
               <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg shadow-zinc-200/80 dark:shadow-none p-3 max-w-47.5 border border-zinc-200 dark:border-zinc-800">
-                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-1">
-                  ✨ No Sign-up
+                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-1 flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+                  <span>No Sign-up</span>
                 </div>
                 <p className="text-[11px] leading-snug text-zinc-500 dark:text-zinc-400">
                   Start chatting instantly without creating an account
@@ -110,8 +112,9 @@ export default function Home() {
               }}
             >
               <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg shadow-zinc-200/80 dark:shadow-none p-3 max-w-47.5 border border-zinc-200 dark:border-zinc-800">
-                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-1">
-                  🔒 End-to-End Encrypted
+                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-1 flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+                  <span>End-to-End Encrypted</span>
                 </div>
                 <p className="text-[11px] leading-snug text-zinc-500 dark:text-zinc-400">
                   Messages are encrypted in your browser
@@ -136,8 +139,9 @@ export default function Home() {
               }}
             >
               <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg shadow-zinc-200/80 dark:shadow-none p-4 max-w-55 border border-zinc-200 dark:border-zinc-800">
-                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-2">
-                  ✓ Room Created
+                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-2 flex items-center gap-1.5">
+                  <Check className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+                  <span>Room Created</span>
                 </div>
                 <p className="text-[11px] leading-snug text-zinc-500 dark:text-zinc-400 mb-3">
                   Share the link with a friend
@@ -156,8 +160,9 @@ export default function Home() {
               variants={floatingVariants}
             >
               <div className="bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl shadow-lg shadow-zinc-200/80 dark:shadow-none p-3 max-w-52.5 border border-zinc-200 dark:border-zinc-800">
-                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-1">
-                  🗑️ Auto-Delete
+                <div className="text-xs font-semibold text-zinc-900 dark:text-white mb-1 flex items-center gap-1.5">
+                  <Trash2 className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+                  <span>Auto-Delete</span>
                 </div>
                 <p className="text-[11px] leading-snug text-zinc-500 dark:text-zinc-400">
                   Messages disappear when everyone leaves
@@ -175,7 +180,7 @@ export default function Home() {
               }}
             >
               <div className="w-14 h-14 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/20">
-                <span className="text-2xl">🔐</span>
+                <Lock className="h-6 w-6 text-white" />
               </div>
             </motion.div>
 

@@ -361,42 +361,43 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         </div>
 
         {/* Sidebar Info Panel (Desktop Only) */}
-        <aside className="hidden md:flex flex-col w-72 shrink-0 pl-6 h-full min-h-0 overflow-y-auto">
-          <div className="flex flex-col gap-6 h-full">
+        <aside className="hidden md:flex flex-col w-72 shrink-0 pl-6 h-full min-h-0">
+          <div className="bg-white/70 dark:bg-zinc-950/20 backdrop-blur-md rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none p-5 flex-1 flex flex-col justify-between">
             
-            {/* Room Parameters Card */}
-            <div>
-              <h3 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2.5">
+            {/* Top Section: Room Parameters */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                 Room Parameters
               </h3>
-              <div className="bg-white/60 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 space-y-4 shadow-xs">
+              
+              <div className="space-y-3.5">
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Room Identifier
                   </span>
-                  <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 select-all truncate block mt-1" title={roomId}>
+                  <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 select-all truncate block mt-0.5" title={roomId}>
                     {roomId}
                   </span>
                 </div>
                 
-                <hr className="border-zinc-100 dark:border-zinc-800/60" />
+                <hr className="border-zinc-100 dark:border-zinc-800/40" />
                 
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Encryption Mode
                   </span>
-                  <span className="text-xs font-semibold text-zinc-850 dark:text-zinc-200 block mt-1">
+                  <span className="text-xs font-semibold text-zinc-850 dark:text-zinc-200 block mt-0.5">
                     AES-GCM 256-bit
                   </span>
                 </div>
                 
-                <hr className="border-zinc-100 dark:border-zinc-800/60" />
+                <hr className="border-zinc-100 dark:border-zinc-800/40" />
                 
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Participants
                   </span>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs font-semibold text-zinc-850 dark:text-zinc-200">
                       {isPartnerJoined ? "2 / 2 Connected" : "1 / 2 Connected"}
                     </span>
@@ -407,41 +408,39 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                   </div>
                 </div>
                 
-                <hr className="border-zinc-100 dark:border-zinc-800/60" />
+                <hr className="border-zinc-100 dark:border-zinc-800/40" />
                 
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Room Established
                   </span>
-                  <span className="text-xs font-semibold text-zinc-850 dark:text-zinc-200 block mt-1">
+                  <span className="text-xs font-semibold text-zinc-850 dark:text-zinc-200 block mt-0.5">
                     {createdTime}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Encryption Details Pill */}
-            <div className="bg-emerald-500/10 dark:bg-emerald-400/5 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl p-4 flex items-start gap-3">
-              <div className="p-2 bg-emerald-500/20 dark:bg-emerald-400/10 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0">
-                <Lock className="h-4 w-4" />
-              </div>
+            {/* Middle Section: Encryption details */}
+            <div className="bg-emerald-500/10 dark:bg-emerald-400/5 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl p-3 flex items-start gap-2.5 my-3 shrink-0">
+              <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <h4 className="text-xs font-semibold text-emerald-800 dark:text-emerald-400">
+                <h4 className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-400">
                   End-to-End Encrypted
                 </h4>
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-500/80 mt-1 leading-normal">
-                  All messages are encrypted inside your browser using locally derived cryptographic keys. Plaintext never traverses the network.
+                <p className="text-[9px] text-emerald-600 dark:text-emerald-550 mt-0.5 leading-normal">
+                  AES-GCM 255-bit keys derived locally; ciphertext only routed.
                 </p>
               </div>
             </div>
 
-            {/* Quick Helper Note */}
-            <div className="mt-auto bg-zinc-100/50 dark:bg-zinc-900/10 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-4">
-              <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
+            {/* Bottom Section: Expiration helper */}
+            <div className="bg-zinc-100/50 dark:bg-zinc-900/10 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-3 shrink-0">
+              <span className="text-[9px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                 Session Expiration
               </span>
-              <p className="text-[10px] text-zinc-500 dark:text-zinc-400/80 mt-1 leading-normal">
-                This chat is completely ephemeral. Once both participants close their tabs, all server and memory allocations are garbage-collected and permanently destroyed.
+              <p className="text-[9px] text-zinc-550 dark:text-zinc-400 mt-0.5 leading-normal">
+                This chat is completely ephemeral. Closing tabs purges memory allocations instantly.
               </p>
             </div>
 

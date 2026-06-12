@@ -90,7 +90,9 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     if (!keys || !window) return;
-    socketRef.current = new WebSocket(`ws://${window.location.host}/api/ws`);
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const host = window.location.host;
+    socketRef.current = new WebSocket(`${protocol}://${host}/api/ws`);
 
     socketRef.current.onopen = () => {
       console.log("WebSocket connection opened");

@@ -8,6 +8,7 @@ import ChatNavBar from "./navbar";
 import WaitingChatRoom from "./waitingChatRoom";
 import ChatRoomActive from "./chatRoomActive";
 import ChatRoomInformation from "./chatRoomInformation";
+import { generateKeysValuePairs } from "@/lib/crypto";
 
 export function ChatRoom({ roomId }: { roomId: string }) {
   const [roomLink, setRoomLink] = useState("");
@@ -15,6 +16,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [isPartnerJoined, setIsPartnerJoined] = useState(false);
   const [createdTime, setCreatedTime] = useState("");
   const [totalUser, setTotalUser] = useState(0);
+  const [keys, setKeys] = useState<{
+    privateKey: CryptoKey;
+    publicKey: string;
+  } | null>(null);
   const [messages, setMessages] = useState<
     Array<{ text: string; sender: "me" | "partner"; time: string }>
   >([]);
@@ -100,7 +105,15 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         ]);
       }
     };
-  }, [roomId]);
+  }, [roomId, keys]);
+
+  useEffect(() => {
+    async function generateKeyValue() {
+      const keys = await generateKeysValuePairs();
+      setKeys(keys);
+    }
+    generateKeyValue();
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

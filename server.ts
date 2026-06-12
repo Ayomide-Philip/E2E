@@ -7,6 +7,7 @@ import { Socket } from "node:net";
 const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
 // const clients: Set<WebSocket> = new Set();
+const rooms: Record<string, Set<WebSocket>> = {};
 
 app.prepare().then(() => {
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -18,7 +19,19 @@ app.prepare().then(() => {
   wss.on("connection", (ws: WebSocket) => {
     console.log("WebSocket connection established");
     ws.on("message", (message: string) => {
-      console.log("Received message:", message.toString());
+      const m = JSON.parse(message.toString());
+
+      console.log("Received message:", m);
+      if (m?.type === "join") {
+        const { roomId } = m;
+
+        if (!rooms[roomId]) {
+          rooms[roomId] = new Set();
+        }
+
+        rooms[roomId].add(ws);
+        console.log(`Room ${roomId}:`, rooms[roomId].size);
+      }
     });
 
     ws.on("close", () => {

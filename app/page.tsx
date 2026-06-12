@@ -9,11 +9,11 @@ export default function Home() {
   function handleStartChatting() {
     const roomId = generateRoomId();
     window.location.href = `/chat/${roomId}`;
-  };
+  }
 
   function handleLearnMore() {
     console.log("Learn More clicked");
-  };
+  }
 
   const floatingVariants: Variants = {
     initial: { y: 0 },
@@ -70,7 +70,10 @@ export default function Home() {
           <Toggle />
         </div>
 
-        <button onClick={handleStartChatting} className="bg-zinc-900 dark:bg-white/95 text-white dark:text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-zinc-700 dark:hover:bg-white transition-colors shadow-sm shadow-black/20">
+        <button
+          onClick={handleStartChatting}
+          className="bg-zinc-900 dark:bg-white/95 text-white dark:text-black px-5 py-2.5 rounded-full font-medium text-sm hover:bg-zinc-700 dark:hover:bg-white transition-colors shadow-sm shadow-black/20"
+        >
           Start Chat
         </button>
       </nav>

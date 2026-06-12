@@ -1,19 +1,11 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Lock,
-  Copy,
-  Check,
-  Send,
-  Users,
-  Clock,
-  Shield,
-  ArrowLeft,
-  Link as LinkIcon
-} from "lucide-react";
+import { Lock, Copy, Check, Send, Shield, ArrowLeft } from "lucide-react";
 import Toggle from "@/components/Toggle";
+import Link from "next/link";
 
 export function ChatRoom({ roomId }: { roomId: string }) {
   const [roomLink, setRoomLink] = useState("");
@@ -22,6 +14,13 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const [createdTime, setCreatedTime] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const socket = new WebSocket(`ws://localhost:3000/api/ws`);
+
+  socket.onopen = () => {
+    console.log("WebSocket connection opened");
+    socket.send(JSON.stringify({ type: "join", roomId }));
+  };
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setRoomLink(`${window.location.origin}/chat/${roomId}`);
@@ -29,7 +28,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   }, [roomId]);
 
   useEffect(() => {
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const time = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     setCreatedTime(`Today at ${time}`);
   }, []);
 
@@ -54,32 +56,32 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       id: 1,
       text: "Hey! Just joined the room. Is this connection secure?",
       sender: "partner",
-      time: "1:42 PM"
+      time: "1:42 PM",
     },
     {
       id: 2,
       text: "Yes, it's end-to-end encrypted using Web Cryptography API. Keys are generated locally and never leave our devices.",
       sender: "me",
-      time: "1:42 PM"
+      time: "1:42 PM",
     },
     {
       id: 3,
       text: "That's awesome. Where are the messages stored?",
       sender: "partner",
-      time: "1:43 PM"
+      time: "1:43 PM",
     },
     {
       id: 4,
       text: "Nowhere! Everything is routed through memory via WebSockets and deleted automatically as soon as the session ends.",
       sender: "me",
-      time: "1:43 PM"
+      time: "1:43 PM",
     },
     {
       id: 5,
       text: "Perfect, no logs left behind! Let's start chatting here.",
       sender: "partner",
-      time: "1:44 PM"
-    }
+      time: "1:44 PM",
+    },
   ];
 
   return (
@@ -88,14 +90,16 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       <div
         className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(circle, #d4d4d8 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle, #d4d4d8 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
       <div
         className="absolute inset-0 hidden dark:block pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(circle, #27272a 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle, #27272a 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
@@ -103,16 +107,15 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       {/* Sticky Top Header */}
       <header className="relative z-20 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-black/20 backdrop-blur-2xl px-4 py-3 shrink-0">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          
           {/* Brand Logo & Back Option */}
           <div className="flex items-center gap-3">
-            <a 
+            <Link
               href="/"
               className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
               title="Leave Room"
             >
               <ArrowLeft className="h-4 w-4" />
-            </a>
+            </Link>
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
                 Private
@@ -128,17 +131,25 @@ export function ChatRoom({ roomId }: { roomId: string }) {
             {/* Room ID Badge */}
             <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-900/60 text-zinc-650 dark:text-zinc-350 text-xs font-mono rounded-full border border-zinc-200/85 dark:border-zinc-800/80">
               <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-650" />
-              <span className="truncate max-w-28" title={roomId}>{roomId}</span>
+              <span className="truncate max-w-28" title={roomId}>
+                {roomId}
+              </span>
             </div>
 
             {/* Status Badge */}
-            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              isPartnerJoined
-                ? "bg-emerald-500/10 text-emerald-700 border-emerald-200/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-900/30"
-                : "bg-amber-500/10 text-amber-700 border-amber-200/50 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-900/30"
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${isPartnerJoined ? "bg-emerald-500 animate-pulse" : "bg-amber-500 animate-pulse"}`} />
-              <span>{isPartnerJoined ? "Connected" : "Waiting for peer..."}</span>
+            <div
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                isPartnerJoined
+                  ? "bg-emerald-500/10 text-emerald-700 border-emerald-200/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-900/30"
+                  : "bg-amber-500/10 text-amber-700 border-amber-200/50 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-900/30"
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${isPartnerJoined ? "bg-emerald-500 animate-pulse" : "bg-amber-500 animate-pulse"}`}
+              />
+              <span>
+                {isPartnerJoined ? "Connected" : "Waiting for peer..."}
+              </span>
             </div>
           </div>
 
@@ -167,7 +178,11 @@ export function ChatRoom({ roomId }: { roomId: string }) {
               }`}
               title="Copy Room Link"
             >
-              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
             </button>
 
             {/* Dark Mode Toggle */}
@@ -180,13 +195,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
       {/* Main Container */}
       <main className="relative z-10 flex-1 flex overflow-hidden w-full max-w-6xl mx-auto p-4 md:p-6 min-h-0">
-        
         {/* Animated Views Container */}
         <div className="flex-1 flex flex-col min-w-0 bg-white/70 dark:bg-zinc-950/20 backdrop-blur-md rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none overflow-hidden">
-          
           <AnimatePresence mode="wait">
             {!isPartnerJoined ? (
-              
               /* Waiting State View */
               <motion.div
                 key="waiting"
@@ -196,27 +208,47 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 transition={{ duration: 0.3 }}
                 className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 text-center"
               >
-                
                 {/* Visual Illustration */}
                 <div className="relative w-36 h-36 mx-auto mb-6 flex items-center justify-center">
                   <motion.div
-                    animate={{ scale: [1, 1.25, 1], opacity: [0.15, 0.4, 0.15] }}
-                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                    animate={{
+                      scale: [1, 1.25, 1],
+                      opacity: [0.15, 0.4, 0.15],
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3.5,
+                      ease: "easeInOut",
+                    }}
                     className="absolute w-36 h-36 rounded-full border border-blue-500/30 dark:border-blue-400/25"
                   />
                   <motion.div
                     animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] }}
-                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 0.6 }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3.5,
+                      ease: "easeInOut",
+                      delay: 0.6,
+                    }}
                     className="absolute w-28 h-28 rounded-full border border-purple-500/35 dark:border-purple-400/25"
                   />
                   <motion.div
                     animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 1.2 }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3.5,
+                      ease: "easeInOut",
+                      delay: 1.2,
+                    }}
                     className="absolute w-20 h-20 rounded-full border border-zinc-200 dark:border-zinc-800"
                   />
                   <motion.div
                     animate={{ y: [-4, 4, -4] }}
-                    transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 4.5,
+                      ease: "easeInOut",
+                    }}
                     className="absolute w-14 h-14 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/25 text-white z-10"
                   >
                     <Lock className="h-6 w-6" />
@@ -228,7 +260,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                   Waiting for someone to join...
                 </h2>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mb-8 leading-relaxed">
-                  Share this link with a friend to start chatting. The session remains temporary and encrypted.
+                  Share this link with a friend to start chatting. The session
+                  remains temporary and encrypted.
                 </p>
 
                 {/* Room Link Card */}
@@ -265,11 +298,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                     </button>
                   </div>
                 </div>
-
               </motion.div>
-
             ) : (
-
               /* Active Chat Layout */
               <motion.div
                 key="chat"
@@ -281,12 +311,14 @@ export function ChatRoom({ roomId }: { roomId: string }) {
               >
                 {/* Scrollable Message Box */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-                  
                   {/* Encryption Notification Banner */}
                   <div className="flex items-center justify-center mb-6">
                     <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 dark:bg-emerald-400/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl text-xs max-w-md text-center shadow-xs">
                       <Shield className="h-3.5 w-3.5 shrink-0" />
-                      <span>This room is fully encrypted end-to-end. No database or server logs are kept.</span>
+                      <span>
+                        This room is fully encrypted end-to-end. No database or
+                        server logs are kept.
+                      </span>
                     </div>
                   </div>
 
@@ -298,8 +330,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                       hidden: { opacity: 0 },
                       show: {
                         opacity: 1,
-                        transition: { staggerChildren: 0.12 }
-                      }
+                        transition: { staggerChildren: 0.12 },
+                      },
                     }}
                     className="flex flex-col gap-4"
                   >
@@ -310,10 +342,12 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                           key={msg.id}
                           variants={{
                             hidden: { opacity: 0, y: 10 },
-                            show: { opacity: 1, y: 0 }
+                            show: { opacity: 1, y: 0 },
                           }}
                           className={`flex flex-col max-w-[80%] sm:max-w-[70%] ${
-                            isMe ? "self-end items-end" : "self-start items-start"
+                            isMe
+                              ? "self-end items-end"
+                              : "self-start items-start"
                           }`}
                         >
                           <div
@@ -354,7 +388,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                     </button>
                   </div>
                 </div>
-
               </motion.div>
             )}
           </AnimatePresence>
@@ -363,25 +396,27 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         {/* Sidebar Info Panel (Desktop Only) */}
         <aside className="hidden md:flex flex-col w-72 shrink-0 pl-6 h-full min-h-0">
           <div className="bg-white/70 dark:bg-zinc-950/20 backdrop-blur-md rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none p-5 flex-1 flex flex-col justify-between">
-            
             {/* Top Section: Room Parameters */}
             <div className="space-y-4">
               <h3 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                 Room Parameters
               </h3>
-              
+
               <div className="space-y-3.5">
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Room Identifier
                   </span>
-                  <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 select-all truncate block mt-0.5" title={roomId}>
+                  <span
+                    className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 select-all truncate block mt-0.5"
+                    title={roomId}
+                  >
                     {roomId}
                   </span>
                 </div>
-                
+
                 <hr className="border-zinc-100 dark:border-zinc-800/40" />
-                
+
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Encryption Mode
@@ -390,9 +425,9 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                     AES-GCM 256-bit
                   </span>
                 </div>
-                
+
                 <hr className="border-zinc-100 dark:border-zinc-800/40" />
-                
+
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Participants
@@ -402,14 +437,18 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                       {isPartnerJoined ? "2 / 2 Connected" : "1 / 2 Connected"}
                     </span>
                     <span className="flex h-2 w-2 relative">
-                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPartnerJoined ? "bg-emerald-400" : "bg-amber-400"}`} />
-                      <span className={`relative inline-flex rounded-full h-2 w-2 ${isPartnerJoined ? "bg-emerald-500" : "bg-amber-500"}`} />
+                      <span
+                        className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPartnerJoined ? "bg-emerald-400" : "bg-amber-400"}`}
+                      />
+                      <span
+                        className={`relative inline-flex rounded-full h-2 w-2 ${isPartnerJoined ? "bg-emerald-500" : "bg-amber-500"}`}
+                      />
                     </span>
                   </div>
                 </div>
-                
+
                 <hr className="border-zinc-100 dark:border-zinc-800/40" />
-                
+
                 <div>
                   <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-bold uppercase tracking-wider block">
                     Room Established
@@ -440,13 +479,12 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 Session Expiration
               </span>
               <p className="text-[9px] text-zinc-550 dark:text-zinc-400 mt-0.5 leading-normal">
-                This chat is completely ephemeral. Closing tabs purges memory allocations instantly.
+                This chat is completely ephemeral. Closing tabs purges memory
+                allocations instantly.
               </p>
             </div>
-
           </div>
         </aside>
-
       </main>
     </div>
   );

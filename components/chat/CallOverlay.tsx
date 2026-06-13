@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, PhoneOff, Mic, Volume2, X } from "lucide-react";
+import { useEffect } from "react";
 
 export default function CallOverlay({
   callState,
@@ -12,6 +13,7 @@ export default function CallOverlay({
   onRejectCall: () => void;
   onEndCall: () => void;
 }) {
+  useEffect(() => {}, []);
   return (
     <AnimatePresence>
       {callState !== "idle" && (
@@ -29,7 +31,6 @@ export default function CallOverlay({
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl w-full max-w-sm overflow-hidden"
           >
-            {/* Header */}
             <div className="p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
                 <Phone className="h-7 w-7 text-white" />
@@ -48,7 +49,6 @@ export default function CallOverlay({
               </p>
             </div>
 
-            {/* Active call controls */}
             {callState === "active" && (
               <div className="flex items-center justify-center gap-6 pb-4">
                 <button className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all flex items-center justify-center cursor-pointer">

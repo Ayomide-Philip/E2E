@@ -108,6 +108,18 @@ app.prepare().then(() => {
             );
           }
         }
+      } else if (
+        m.type === "webrtc-offer" ||
+        m.type === "webrtc-answer" ||
+        m.type === "webrtc-ice"
+      ) {
+        const roomId = clientsRoom.get(ws);
+        if (!roomId) return;
+        for (const client of rooms[roomId]) {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(m));
+          }
+        }
       }
     });
 

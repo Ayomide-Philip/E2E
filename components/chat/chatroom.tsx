@@ -40,6 +40,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
   const handleCopy = async () => {
     try {
@@ -50,6 +52,60 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       console.error("Failed to copy link", err);
     }
   };
+
+  async function startCall() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast.error("Your browser does not support WebRTC.");
+      return;
+    }
+    setCallState("calling");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      const peerConnection = new RTCPeerConnection({
+        iceServers: [
+          {
+            urls: "stun:stun.l.google.com:19302",
+          },
+        ],
+      });
+      stream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, stream);
+      });
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socketRef.current?.send(
+            JSON.stringify({
+              type: "webrtc-ice",
+              candidate: event.candidate,
+            }),
+          );
+        }
+      };
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      socketRef.current?.send(
+        JSON.stringify({
+          type: "webrtc-offer",
+          offer,
+        }),
+      );
+      localStreamRef.current = stream;
+      peerConnectionRef.current = peerConnection;
+      setCallState("active");
+    } catch (err) {
+      console.log("Failed to start call", err);
+      toast.error("Failed to start call. Please try again.");
+    }
+  }
+
+  async function hangCall() {
+    if (peerConnectionRef.current) peerConnectionRef.current.close();
+    if (localStreamRef.current)
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+    setCallState("idle");
+  }
 
   async function handleSendMessage() {
     if (!inputMessage.trim() || !isPartnerJoined) return;
@@ -159,6 +215,33 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       if (data?.type === "typing") {
         setPartnerTyping(data?.isTyping);
       }
+
+      if (data?.type === "webrtc-offer") {
+        setCallState("incoming");
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        const peerConnection = new RTCPeerConnection({
+          iceServers: [
+            {
+              urls: "stun:stun.l.google.com:19302",
+            },
+          ],
+        });
+
+        stream.getTracks().forEach((t) => peerConnection.addTrack(t, stream));
+
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            socketRef.current?.send(
+              JSON.stringify({
+                type: "webrtc-ice",
+                candidate: event.candidate,
+              }),
+            );
+          }
+        };
+      }
     };
   }, [roomId, keys]);
 
@@ -242,10 +325,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         handleCopy={handleCopy}
         copied={copied}
         callState={callState}
-        onStartCall={() => setCallState("calling")}
+        onStartCall={startCall}
         onAnswerCall={() => setCallState("active")}
         onRejectCall={() => setCallState("idle")}
-        onEndCall={() => setCallState("idle")}
+        onEndCall={hangCall}
       />
 
       <main className="relative z-10 flex-1 flex overflow-hidden w-full mx-auto p-2 sm:p-3 md:p-6 xl:p-8 2xl:p-10 min-h-0">

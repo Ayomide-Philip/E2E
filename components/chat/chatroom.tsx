@@ -31,6 +31,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
     Array<{ text: string; sender: "me" | "partner"; time: string }>
   >([]);
   const [inputMessage, setInputMessage] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isTyping, setIsTyping] = useState(false);
   const [partnerTyping, setPartnerTyping] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -258,7 +259,6 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 setInputMessage={setInputMessage}
                 handleSendMessage={handleSendMessage}
                 messagesEndRef={messagesEndRef}
-                isTyping={isTyping}
                 partnerTyping={partnerTyping}
               />
             )}

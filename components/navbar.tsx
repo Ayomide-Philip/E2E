@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export default function NavBar() {
   const router = useRouter();
   return (
-    <nav className="sticky top-3 sm:top-4 z-50 mx-auto flex w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-6xl items-center justify-between rounded-full px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-white/70 dark:bg-black/20 backdrop-blur-2xl border border-zinc-200 dark:border-white/10 shadow-[0_12px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_35px_rgba(0,0,0,0.22)]">
+    <nav className="sticky top-3 sm:top-4 z-50 mx-auto flex w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] items-center justify-between rounded-full px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-white/70 dark:bg-black/20 backdrop-blur-2xl border border-zinc-200 dark:border-white/10 shadow-[0_12px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_35px_rgba(0,0,0,0.22)]">
       <div className="flex items-center gap-1.5 sm:gap-2">
         <span className="text-base sm:text-lg md:text-xl font-bold text-zinc-900 dark:text-white">
           Private

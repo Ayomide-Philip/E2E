@@ -30,8 +30,7 @@ export default function ChatRoomActive({
           <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500/10 dark:bg-emerald-400/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl text-[10px] sm:text-xs max-w-[90%] sm:max-w-md text-center shadow-xs">
             <Shield className="h-3 sm:h-3.5 w-3 sm:w-3.5 shrink-0" />
             <span>
-              This room is fully encrypted end-to-end. No database or server
-              logs are kept.
+              End-to-end encrypted chat
             </span>
           </div>
         </div>

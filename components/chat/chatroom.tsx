@@ -73,6 +73,13 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       stream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, stream);
       });
+
+      peerConnection.ontrack = (event) => {
+        const audioEl = document.getElementById(
+          "remoteAudio",
+        ) as HTMLAudioElement;
+        if (audioEl) audioEl.srcObject = event.streams[0];
+      };
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
           socketRef.current?.send(
@@ -88,12 +95,11 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       socketRef.current?.send(
         JSON.stringify({
           type: "webrtc-offer",
-          offer,
+          sdp: offer,
         }),
       );
       localStreamRef.current = stream;
       peerConnectionRef.current = peerConnection;
-      setCallState("active");
     } catch (err) {
       console.log("Failed to start call", err);
       toast.error("Failed to start call. Please try again.");
@@ -101,9 +107,16 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   }
 
   async function hangCall() {
-    if (peerConnectionRef.current) peerConnectionRef.current.close();
-    if (localStreamRef.current)
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => track.stop());
+      localStreamRef.current = null;
+    }
+    const audioEl = document.getElementById("remoteAudio") as HTMLAudioElement;
+    if (audioEl) audioEl.srcObject = null;
     setCallState("idle");
   }
 
@@ -231,6 +244,13 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
         stream.getTracks().forEach((t) => peerConnection.addTrack(t, stream));
 
+        peerConnection.ontrack = (event) => {
+          const audioEl = document.getElementById(
+            "remoteAudio",
+          ) as HTMLAudioElement;
+          if (audioEl) audioEl.srcObject = event.streams[0];
+        };
+
         peerConnection.onicecandidate = (event) => {
           if (event.candidate) {
             socketRef.current?.send(
@@ -241,6 +261,29 @@ export function ChatRoom({ roomId }: { roomId: string }) {
             );
           }
         };
+
+        peerConnectionRef.current = peerConnection;
+        localStreamRef.current = stream;
+
+        const answer = await peerConnection.createAnswer(
+          new RTCSessionDescription(data.sdp),
+        );
+        await peerConnection.setLocalDescription(answer);
+        socketRef.current?.send(
+          JSON.stringify({
+            type: "webrtc-answer",
+            sdp: answer,
+          }),
+        );
+      }
+
+      if (data?.type === "webrtc-answer") {
+        await peerConnectionRef.current?.setRemoteDescription(data.sdp);
+        setCallState("active");
+      }
+
+      if (data?.type === "webrtc-ice") {
+        await peerConnectionRef.current?.addIceCandidate(data.candidate);
       }
     };
   }, [roomId, keys]);
@@ -330,6 +373,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         onRejectCall={() => setCallState("idle")}
         onEndCall={hangCall}
       />
+      <audio id="remoteAudio" autoPlay />
 
       <main className="relative z-10 flex-1 flex overflow-hidden w-full mx-auto p-2 sm:p-3 md:p-6 xl:p-8 2xl:p-10 min-h-0">
         <div className="flex-1 flex flex-col min-w-0 bg-white/70 dark:bg-zinc-950/20 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-none overflow-hidden">

@@ -95,6 +95,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       };
 
       peerConnection.oniceconnectionstatechange = () => {
+        console.log("ICE state:", peerConnection.iceConnectionState);
+        if (peerConnection.iceConnectionState === "connected") {
+          console.log("✅ ICE connected - audio should flow");
+        }
         if (
           peerConnection.iceConnectionState === "disconnected" ||
           peerConnection.iceConnectionState === "failed" ||
@@ -285,6 +289,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         localStreamRef.current = stream;
 
         peerConnection.oniceconnectionstatechange = () => {
+          console.log("ICE state:", peerConnection.iceConnectionState);
+          if (peerConnection.iceConnectionState === "connected") {
+            console.log("✅ ICE connected - audio should flow");
+          }
           if (
             peerConnection.iceConnectionState === "disconnected" ||
             peerConnection.iceConnectionState === "failed" ||

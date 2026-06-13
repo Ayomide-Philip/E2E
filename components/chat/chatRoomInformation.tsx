@@ -1,14 +1,18 @@
-import { Lock } from "lucide-react";
+import { Lock, KeyRound } from "lucide-react";
 export default function ChatRoomInformation({
   roomId,
   isPartnerJoined,
   totalUser,
   createdTime,
+  myPublicKey = "MIIBCgKCAQEAu1SU3...M4zYwIDAQAB",
+  partnerPublicKey,
 }: {
   roomId: string;
   isPartnerJoined: boolean;
   totalUser: number;
   createdTime: string;
+  myPublicKey?: string;
+  partnerPublicKey?: string | null;
 }) {
   return (
     <aside className="hidden md:flex flex-col w-68 shrink-0 pl-4 h-full min-h-0">
@@ -136,7 +140,60 @@ export default function ChatRoomInformation({
           </div>
         </div>
 
-        <div className="bg-linear-to-br from-emerald-500/10 to-teal-500/5 dark:from-emerald-500/8 dark:to-teal-500/3 border border-emerald-500/20 dark:border-emerald-500/15 rounded-2xl p-4 shrink-0">
+        <div className="bg-white/80 dark:bg-zinc-950/40 backdrop-blur-sm rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shrink-0">
+          <p className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-3">
+            Public Keys
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-start gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                <KeyRound className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[9px] text-zinc-400 dark:text-zinc-500 font-semibold uppercase tracking-wider">
+                  Your Key
+                </p>
+                <p
+                  className="text-[9px] font-mono font-medium text-zinc-700 dark:text-zinc-300 mt-0.5 break-all select-all leading-relaxed"
+                  title={myPublicKey}
+                >
+                  {myPublicKey.length > 40
+                    ? `${myPublicKey.slice(0, 20)}...${myPublicKey.slice(-20)}`
+                    : myPublicKey}
+                </p>
+              </div>
+            </div>
+
+            <hr className="border-zinc-100 dark:border-zinc-800/50" />
+
+            <div className="flex items-start gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-purple-100 dark:bg-purple-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                <KeyRound className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[9px] text-zinc-400 dark:text-zinc-500 font-semibold uppercase tracking-wider">
+                  Partner&apos;s Key
+                </p>
+                {partnerPublicKey ? (
+                  <p
+                    className="text-[9px] font-mono font-medium text-zinc-700 dark:text-zinc-300 mt-0.5 break-all select-all leading-relaxed"
+                    title={partnerPublicKey}
+                  >
+                    {partnerPublicKey.length > 40
+                      ? `${partnerPublicKey.slice(0, 20)}...${partnerPublicKey.slice(-20)}`
+                      : partnerPublicKey}
+                  </p>
+                ) : (
+                  <p className="text-[9px] font-medium text-amber-500 dark:text-amber-400 mt-0.5 italic">
+                    Awaiting peer connection...
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* <div className="bg-linear-to-br from-emerald-500/10 to-teal-500/5 dark:from-emerald-500/8 dark:to-teal-500/3 border border-emerald-500/20 dark:border-emerald-500/15 rounded-2xl p-4 shrink-0">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-5 h-5 rounded-md bg-emerald-500/20 dark:bg-emerald-400/15 flex items-center justify-center">
               <Lock className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
@@ -174,7 +231,7 @@ export default function ChatRoomInformation({
             No logs, no database. All data is purged the moment both
             participants leave.
           </p>
-        </div>
+        </div> */}
       </div>
     </aside>
   );

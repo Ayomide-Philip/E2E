@@ -230,6 +230,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           isPartnerJoined={isPartnerJoined}
           totalUser={totalUser}
           createdTime={createdTime}
+          myPublicKey={keys?.publicKey}
+          partnerPublicKey={partnerPublicKey}
         />
       </main>
     </div>

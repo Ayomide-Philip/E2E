@@ -108,6 +108,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   }
 
   async function hangCall() {
+    socketRef.current?.send(JSON.stringify({ type: "call-ended" }));
+
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
       peerConnectionRef.current = null;
@@ -283,12 +285,23 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       }
 
       if (data?.type === "webrtc-answer") {
-        await peerConnectionRef.current?.setRemoteDescription(data.sdp);
-        setCallState("active");
+        if (peerConnectionRef.current) {
+          await peerConnectionRef.current.setRemoteDescription(
+            new RTCSessionDescription(data.sdp),
+          );
+          setCallState("active");
+        }
       }
 
       if (data?.type === "webrtc-ice") {
-        await peerConnectionRef.current?.addIceCandidate(data.candidate);
+        if (peerConnectionRef.current && data.candidate) {
+          const candidate = new RTCIceCandidate(data.candidate);
+          await peerConnectionRef.current.addIceCandidate(candidate);
+        }
+      }
+
+      if (data?.type === "call-ended") {
+        
       }
     };
   }, [roomId, keys]);

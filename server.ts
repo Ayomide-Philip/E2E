@@ -120,6 +120,14 @@ app.prepare().then(() => {
             client.send(JSON.stringify(m));
           }
         }
+      } else if (m.type === "call-ended") {
+        const roomId = clientsRoom.get(ws);
+        if (!roomId) return;
+        for (const client of rooms[roomId]) {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ type: "call-ended" }));
+          }
+        }
       }
     });
 

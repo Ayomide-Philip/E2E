@@ -90,6 +90,7 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           );
         }
       };
+
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
       socketRef.current?.send(
@@ -264,6 +265,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
 
         peerConnectionRef.current = peerConnection;
         localStreamRef.current = stream;
+
+        await peerConnection.setRemoteDescription(
+          new RTCSessionDescription(data.sdp),
+        );
 
         const answer = await peerConnection.createAnswer(
           new RTCSessionDescription(data.sdp),

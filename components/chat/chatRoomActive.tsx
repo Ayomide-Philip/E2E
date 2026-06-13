@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Send, Shield } from "lucide-react";
-import { RefObject } from "react";
+import { RefObject, useRef, useEffect } from "react";
 export default function ChatRoomActive({
   messages,
   isPartnerJoined,
@@ -18,6 +18,16 @@ export default function ChatRoomActive({
   messagesEndRef: RefObject<HTMLDivElement | null>;
   partnerTyping: boolean;
 }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+    }
+  }, [inputMessage]);
+
   return (
     <motion.div
       key="chat"
@@ -122,8 +132,8 @@ export default function ChatRoomActive({
 
       <div className="p-2 sm:p-3 md:p-4 bg-linear-to-t from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 dark:to-transparent shrink-0 border-t border-zinc-200/80 dark:border-zinc-800/60">
         <div className="flex items-center gap-1.5 sm:gap-2 max-w-4xl mx-auto bg-white dark:bg-zinc-900 backdrop-blur-md rounded-xl sm:rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_4px_20px_rgb(0,0,0,0.04)] dark:shadow-none p-1 sm:p-1.5">
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             placeholder="Type a message..."
             disabled={!isPartnerJoined}
             value={inputMessage}
@@ -134,7 +144,8 @@ export default function ChatRoomActive({
                 handleSendMessage();
               }
             }}
-            className="flex-1 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 cursor-text disabled:cursor-not-allowed"
+            rows={1}
+            className="flex-1 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 cursor-text disabled:cursor-not-allowed resize-none min-h-9 sm:min-h-10 max-h-40 leading-relaxed"
           />
           <button
             onClick={handleSendMessage}

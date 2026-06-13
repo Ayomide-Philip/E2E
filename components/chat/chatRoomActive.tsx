@@ -61,13 +61,13 @@ export default function ChatRoomActive({
                 }`}
               >
                 <div
-                  className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                  className={`px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-full ${
                     isMe
                       ? "bg-zinc-900 dark:bg-white text-white dark:text-black rounded-tr-xs shadow-xs"
                       : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-800/85 rounded-tl-xs shadow-xs"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{msg.text}</p>
+                  <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                 </div>
                 <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 px-1.5 font-medium">
                   {msg.time}

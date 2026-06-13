@@ -180,10 +180,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   }, [roomId]);
 
   useEffect(() => {
-    if (isPartnerJoined) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [isPartnerJoined]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isPartnerJoined, partnerTyping]);
 
   useEffect(() => {
     if (inputMessage.trim()) {

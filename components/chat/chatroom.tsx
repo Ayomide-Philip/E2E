@@ -301,7 +301,20 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       }
 
       if (data?.type === "call-ended") {
-        
+        if (peerConnectionRef.current) {
+          peerConnectionRef.current.close();
+          peerConnectionRef.current = null;
+        }
+        if (localStreamRef.current) {
+          localStreamRef.current.getTracks().forEach((track) => track.stop());
+          localStreamRef.current = null;
+        }
+        const audioEl = document.getElementById(
+          "remoteAudio",
+        ) as HTMLAudioElement;
+        if (audioEl) audioEl.srcObject = null;
+        setCallState("idle");
+        toast.info("Call ended by partner");
       }
     };
   }, [roomId, keys]);

@@ -31,6 +31,9 @@ export function ChatRoom({ roomId }: { roomId: string }) {
     Array<{ text: string; sender: "me" | "partner"; time: string }>
   >([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [partnerTyping, setPartnerTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
 
@@ -148,6 +151,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       if (data?.type === "peer-public-key") {
         setPartnerPublicKey(data?.publicKey);
       }
+
+      if (data?.type === "typing") {
+        setPartnerTyping(data?.isTyping);
+      }
     };
   }, [roomId, keys]);
 
@@ -176,6 +183,37 @@ export function ChatRoom({ roomId }: { roomId: string }) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [isPartnerJoined]);
+
+  useEffect(() => {
+    if (inputMessage.trim()) {
+      setIsTyping(true);
+      socketRef.current?.send(
+        JSON.stringify({ type: "typing", isTyping: true }),
+      );
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        socketRef.current?.send(
+          JSON.stringify({ type: "typing", isTyping: false }),
+        );
+      }, 2000);
+    } else {
+      setIsTyping(false);
+      socketRef.current?.send(
+        JSON.stringify({ type: "typing", isTyping: false }),
+      );
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    }
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [inputMessage]);
 
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
@@ -220,6 +258,8 @@ export function ChatRoom({ roomId }: { roomId: string }) {
                 setInputMessage={setInputMessage}
                 handleSendMessage={handleSendMessage}
                 messagesEndRef={messagesEndRef}
+                isTyping={isTyping}
+                partnerTyping={partnerTyping}
               />
             )}
           </AnimatePresence>

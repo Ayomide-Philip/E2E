@@ -8,6 +8,8 @@ export default function ChatRoomActive({
   setInputMessage,
   handleSendMessage,
   messagesEndRef,
+  isTyping,
+  partnerTyping,
 }: {
   messages: { sender: "me" | "partner"; text: string; time: string }[];
   isPartnerJoined: boolean;
@@ -15,6 +17,8 @@ export default function ChatRoomActive({
   setInputMessage: (message: string) => void;
   handleSendMessage: () => void;
   messagesEndRef: RefObject<HTMLDivElement | null>;
+  isTyping: boolean;
+  partnerTyping: boolean;
 }) {
   return (
     <motion.div
@@ -29,9 +33,7 @@ export default function ChatRoomActive({
         <div className="flex items-center justify-center mb-4 sm:mb-6">
           <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500/10 dark:bg-emerald-400/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl text-[10px] sm:text-xs max-w-[90%] sm:max-w-md text-center shadow-xs">
             <Shield className="h-3 sm:h-3.5 w-3 sm:w-3.5 shrink-0" />
-            <span>
-              End-to-end encrypted chat
-            </span>
+            <span>End-to-end encrypted chat</span>
           </div>
         </div>
 
@@ -76,6 +78,48 @@ export default function ChatRoomActive({
             );
           })}
         </motion.div>
+
+        {partnerTyping && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="self-start flex items-center gap-2 px-4 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800/85 shadow-xs"
+          >
+            <div className="flex items-center gap-1">
+              <motion.span
+                animate={{ y: [0, -4, 0] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 0.8,
+                  ease: "easeInOut",
+                }}
+                className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500"
+              />
+              <motion.span
+                animate={{ y: [0, -4, 0] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 0.8,
+                  ease: "easeInOut",
+                  delay: 0.15,
+                }}
+                className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500"
+              />
+              <motion.span
+                animate={{ y: [0, -4, 0] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 0.8,
+                  ease: "easeInOut",
+                  delay: 0.3,
+                }}
+                className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500"
+              />
+            </div>
+            <span className="text-xs font-medium">Partner is typing...</span>
+          </motion.div>
+        )}
 
         <div ref={messagesEndRef} />
       </div>

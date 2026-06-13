@@ -95,6 +95,19 @@ app.prepare().then(() => {
             );
           }
         }
+      } else if (m?.type === "typing") {
+        const roomId = clientsRoom.get(ws);
+        if (!roomId) return;
+        for (const client of rooms[roomId]) {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "typing",
+                isTyping: m?.isTyping,
+              }),
+            );
+          }
+        }
       }
     });
 

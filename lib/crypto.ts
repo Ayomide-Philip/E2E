@@ -100,3 +100,15 @@ export async function decryptMessage(
 
   return new TextDecoder().decode(decrypted);
 }
+
+export async function getFingerprint(base64PublicKey: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const hash = await crypto.subtle.digest(
+    "SHA-256",
+    encoder.encode(base64PublicKey),
+  );
+  const hex = Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hex.slice(0, 12).match(/.{4}/g)?.join("-") || "";
+}

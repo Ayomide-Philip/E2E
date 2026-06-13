@@ -1,10 +1,12 @@
+import { getFingerprint } from "@/lib/crypto";
 import { Lock, KeyRound } from "lucide-react";
+import { useEffect, useState } from "react";
 export default function ChatRoomInformation({
   roomId,
   isPartnerJoined,
   totalUser,
   createdTime,
-  myPublicKey = "MIIBCgKCAQEAu1SU3...M4zYwIDAQAB",
+  myPublicKey = "",
   partnerPublicKey,
 }: {
   roomId: string;
@@ -14,6 +16,31 @@ export default function ChatRoomInformation({
   myPublicKey?: string;
   partnerPublicKey?: string | null;
 }) {
+  const [myFingerprint, setMyFingerprint] = useState("");
+  const [partnerFingerprint, setPartnerFingerprint] = useState("");
+
+  useEffect(() => {
+    async function fetchFingerprint() {
+      if (myPublicKey) {
+        const fingerprint = await getFingerprint(myPublicKey);
+        setMyFingerprint(fingerprint);
+      }
+    }
+
+    fetchFingerprint();
+  }, [myPublicKey]);
+
+  useEffect(() => {
+    async function fetchPartnerFingerprint() {
+      if (partnerPublicKey) {
+        const fingerprint = await getFingerprint(partnerPublicKey);
+        setPartnerFingerprint(fingerprint);
+      }
+    }
+
+    fetchPartnerFingerprint();
+  }, [partnerPublicKey]);
+
   return (
     <aside className="hidden md:flex flex-col w-68 xl:w-80 shrink-0 pl-4 h-full min-h-0">
       <div className="flex-1 flex flex-col gap-3 min-h-0">
@@ -157,9 +184,7 @@ export default function ChatRoomInformation({
                   className="text-[9px] font-mono font-medium text-zinc-700 dark:text-zinc-300 mt-0.5 break-all select-all leading-relaxed"
                   title={myPublicKey}
                 >
-                  {myPublicKey.length > 40
-                    ? `${myPublicKey.slice(0, 20)}...${myPublicKey.slice(-20)}`
-                    : myPublicKey}
+                  {myFingerprint || "No fingerprint available"}
                 </p>
               </div>
             </div>
@@ -179,9 +204,7 @@ export default function ChatRoomInformation({
                     className="text-[9px] font-mono font-medium text-zinc-700 dark:text-zinc-300 mt-0.5 break-all select-all leading-relaxed"
                     title={partnerPublicKey}
                   >
-                    {partnerPublicKey.length > 40
-                      ? `${partnerPublicKey.slice(0, 20)}...${partnerPublicKey.slice(-20)}`
-                      : partnerPublicKey}
+                    {partnerFingerprint || "No fingerprint available"}
                   </p>
                 ) : (
                   <p className="text-[9px] font-medium text-amber-500 dark:text-amber-400 mt-0.5 italic">

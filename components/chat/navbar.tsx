@@ -1,20 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Check, Copy, Lock } from "lucide-react";
+import { ArrowLeft, Check, Copy, Lock, Phone, PhoneOff } from "lucide-react";
 import Toggle from "@/components/Toggle";
 import { motion } from "framer-motion";
+import CallOverlay from "./CallOverlay";
 
 export default function ChatNavBar({
   roomId,
   isPartnerJoined,
   handleCopy,
   copied,
+  callState,
+  onStartCall,
+  onAnswerCall,
+  onRejectCall,
+  onEndCall,
 }: {
   roomId: string;
   isPartnerJoined: boolean;
-  handleCopy: () => void;
+  handleCopy: () => void | Promise<void>;
   copied: boolean;
+  callState: "idle" | "calling" | "incoming" | "active";
+  onStartCall: () => void;
+  onAnswerCall: () => void;
+  onRejectCall: () => void;
+  onEndCall: () => void;
 }) {
   return (
     <div className="relative z-20 w-full px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-3 shrink-0">
@@ -96,11 +107,39 @@ export default function ChatNavBar({
             </span>
           </button>
 
+          {isPartnerJoined && (
+            <button
+              onClick={callState === "active" ? onEndCall : onStartCall}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-semibold border transition-all cursor-pointer ${
+                callState === "active"
+                  ? "bg-red-500 border-red-500 text-white animate-pulse"
+                  : "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              }`}
+              title={callState === "active" ? "End Call" : "Start a Call"}
+            >
+              {callState === "active" ? (
+                <PhoneOff className="h-3 w-3 shrink-0" />
+              ) : (
+                <Phone className="h-3 w-3 shrink-0" />
+              )}
+              <span className="hidden md:inline">
+                {callState === "active" ? "End Call" : "Call"}
+              </span>
+            </button>
+          )}
+
           <div className="p-1.5 sm:p-2 rounded-full border bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center">
             <Toggle />
           </div>
         </div>
       </nav>
+
+      <CallOverlay
+        callState={callState}
+        onAnswerCall={onAnswerCall}
+        onRejectCall={onRejectCall}
+        onEndCall={onEndCall}
+      />
     </div>
   );
 }

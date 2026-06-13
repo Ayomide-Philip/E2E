@@ -1,4 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# End-to-End Encrypted Chat App
+
+A secure, real-time chat application built with **Next.js**, **WebSockets**, and **AES-GCM 256-bit** encryption. Messages are encrypted in the browser before being sent — the server only relays ciphertext.
+
+## Features
+
+### 🔐 End-to-End Encryption
+
+- Elliptic Curve Diffie-Hellman (ECDH) key exchange for shared secret derivation
+- AES-GCM 256-bit symmetric encryption for all messages
+- Keys are generated locally in the browser — never sent to the server
+- Public key fingerprints displayed in the sidebar for identity verification
+
+### 💬 Real-Time Messaging
+
+- WebSocket-based instant messaging with low latency
+- Auto-scroll to the latest message
+- Multi-line message input with Shift+Enter for new lines and auto-resize textarea
+- Long messages wrap properly with no horizontal overflow
+
+### ⌨️ Typing Indicator
+
+- Real-time typing detection with 2-second debounce
+- Animated bouncing dots styled like a regular message bubble (WhatsApp-style)
+- Typing events sent via WebSocket so both peers see each other's status
+
+### 🎨 Responsive Design
+
+- Fully responsive across mobile, tablet, and desktop breakpoints
+- Collapsible sidebar (hidden on mobile) showing session info, fingerprints, and encryption details
+- Full-width layout on large screens with adaptive padding
+- Touch-friendly button sizing and spacing on mobile
+
+### 🌗 Dark Mode
+
+- System-aware theme with manual toggle
+- Dark mode support across all components with tailored color schemes
+
+### 🧹 Ephemeral Sessions
+
+- No database or server-side logging
+- All data is purged when both participants leave the room
+- Sessions are temporary — no message history is persisted
 
 ## Getting Started
 
@@ -16,21 +58,12 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **Animations:** Framer Motion
+- **Encryption:** Web Crypto API (ECDH + AES-GCM)
+- **Real-Time:** WebSockets
+- **Icons:** Lucide React

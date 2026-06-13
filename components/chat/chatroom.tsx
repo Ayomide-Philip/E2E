@@ -34,6 +34,9 @@ export function ChatRoom({ roomId }: { roomId: string }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isTyping, setIsTyping] = useState(false);
   const [partnerTyping, setPartnerTyping] = useState(false);
+  const [callState, setCallState] = useState<
+    "idle" | "calling" | "incoming" | "active"
+  >("idle");
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -238,6 +241,11 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         isPartnerJoined={isPartnerJoined}
         handleCopy={handleCopy}
         copied={copied}
+        callState={callState}
+        onStartCall={() => setCallState("calling")}
+        onAnswerCall={() => setCallState("active")}
+        onRejectCall={() => setCallState("idle")}
+        onEndCall={() => setCallState("idle")}
       />
 
       <main className="relative z-10 flex-1 flex overflow-hidden w-full mx-auto p-2 sm:p-3 md:p-6 xl:p-8 2xl:p-10 min-h-0">

@@ -78,7 +78,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
         const audioEl = document.getElementById(
           "remoteAudio",
         ) as HTMLAudioElement;
-        if (audioEl) audioEl.srcObject = event.streams[0];
+        if (audioEl) {
+          audioEl.srcObject = event.streams[0];
+          audioEl.play().catch((e) => console.log("Autoplay prevented:", e));
+        }
       };
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
@@ -261,7 +264,10 @@ export function ChatRoom({ roomId }: { roomId: string }) {
           const audioEl = document.getElementById(
             "remoteAudio",
           ) as HTMLAudioElement;
-          if (audioEl) audioEl.srcObject = event.streams[0];
+          if (audioEl) {
+            audioEl.srcObject = event.streams[0];
+            audioEl.play().catch((e) => console.log("Autoplay prevented:", e));
+          }
         };
 
         peerConnection.onicecandidate = (event) => {

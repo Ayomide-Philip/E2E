@@ -33,7 +33,7 @@ export default function ChatNavBar({
             <span className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
               Private
             </span>
-            <span className="hidden xs:inline-flex bg-linear-to-br from-blue-500 to-purple-600 text-[9px] text-white px-1.5 py-0.5 rounded-full font-bold">
+            <span className="hidden sm:inline-flex bg-linear-to-br from-blue-500 to-purple-600 text-[9px] text-white px-1.5 py-0.5 rounded-full font-bold">
               E2E
             </span>
           </div>

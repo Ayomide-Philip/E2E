@@ -8,10 +8,6 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
 
-  function handleLearnMore() {
-    console.log("Learn More clicked");
-  }
-
   const floatingVariants: Variants = {
     initial: { y: 0 },
     animate: {
@@ -188,12 +184,12 @@ export default function Home() {
                 </motion.button>
 
                 <motion.button
-                  onClick={handleLearnMore}
+                  onClick={() => router.push("/group")}
                   className="border-2 border-zinc-300 dark:border-zinc-700 cursor-pointer text-zinc-800 dark:text-white px-7 py-3.5 rounded-xl font-semibold text-sm md:text-base hover:bg-zinc-100 dark:hover:bg-zinc-900/50 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Learn More
+                  Join Group
                 </motion.button>
               </div>
             </motion.div>

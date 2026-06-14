@@ -9,7 +9,6 @@ const handle = app.getRequestHandler();
 const rooms: Record<string, Set<WebSocket>> = {};
 const clientsRoom = new Map<WebSocket, string>();
 const groups: Record<string, { name: string; password?: string }> = {};
-const clientsGroup = new Map<WebSocket, string>();
 const clientsPublicKeys = new Map<WebSocket, string>();
 
 app.prepare().then(() => {
@@ -143,6 +142,36 @@ app.prepare().then(() => {
             );
             ws.close();
             return;
+          }
+          groups[roomId] = { name: roomName, password: roomPassword };
+          rooms[roomId] = new Set();
+        } else {
+          if (
+            groups[roomId].password &&
+            groups[roomId].password !== roomPassword
+          ) {
+            ws.send(
+              JSON.stringify({
+                type: "require-password",
+                message: "Incorrect password for the room",
+              }),
+            );
+            return;
+          }
+        }
+
+        rooms[roomId].add(ws);
+        clientsRoom.set(ws, roomId);
+
+        for (const client of rooms[roomId]) {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "peer-joined",
+                count: rooms[roomId].size,
+                name: groups[roomId].name,
+              }),
+            );
           }
         }
       }

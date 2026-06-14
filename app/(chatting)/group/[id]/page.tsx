@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -52,7 +53,8 @@ export default function Page() {
   }
 
   useEffect(() => {
-    if (!window || !startGroupChat || !groupPassword?.trim()) return;
+    if (!window || !groupPassword?.trim() || groupPassword?.trim().length < 6)
+      return;
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const host = window.location.host;
     socketRef.current = new WebSocket(`${protocol}://${host}/api/ws`);

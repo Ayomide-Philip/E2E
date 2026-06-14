@@ -23,6 +23,7 @@ export default function Page() {
   const socketRef = useRef<WebSocket | null>(null);
   const [groupPassword, setGroupPassword] = useState<string | null>(null);
   const [startGroupChat, setStartGroupChat] = useState<boolean>(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPartnerTyping(true);
@@ -51,7 +52,7 @@ export default function Page() {
   }
 
   useEffect(() => {
-    if (!window) return;
+    if (!window || !startGroupChat || !groupPassword?.trim()) return;
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const host = window.location.host;
     socketRef.current = new WebSocket(`${protocol}://${host}/api/ws`);
@@ -59,7 +60,7 @@ export default function Page() {
     socketRef.current.onopen = () => {
       console.log("WebSocket connection established");
     };
-  }, []);
+  }, [groupPassword, startGroupChat]);
 
   const isPartnerJoined = true;
 

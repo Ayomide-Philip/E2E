@@ -4,11 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
   LogIn,
-  Search,
-  SlidersHorizontal,
-  ArrowUpDown,
-  Users,
-  CalendarDays,
   Lock,
   Globe,
   Copy,
@@ -19,82 +14,11 @@ import {
   Loader2,
   Check,
   Sparkles,
-  Building2,
 } from "lucide-react";
-import { useState, useMemo, useRef } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/navbar";
 import { toast } from "sonner";
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-type Room = {
-  id: string;
-  name: string;
-  description: string;
-  participants: number;
-  createdAt: string;
-  isPrivate: boolean;
-};
-
-type FilterOption = "all" | "public" | "private";
-type SortOption = "newest" | "oldest" | "most-active" | "name";
-
-// ─── Mock Data ──────────────────────────────────────────────────────────────
-
-const MOCK_ROOMS: Room[] = [
-  {
-    id: "a1b2c3d4",
-    name: "Tech Talk",
-    description: "Discuss the latest in tech, AI, and software development.",
-    participants: 12,
-    createdAt: "2026-06-10",
-    isPrivate: false,
-  },
-  {
-    id: "e5f6g7h8",
-    name: "Book Club",
-    description: "Monthly book discussions and reading recommendations.",
-    participants: 8,
-    createdAt: "2026-06-08",
-    isPrivate: false,
-  },
-  {
-    id: "i9j0k1l2",
-    name: "Project Alpha",
-    description: "Private team collaboration for Project Alpha.",
-    participants: 5,
-    createdAt: "2026-06-05",
-    isPrivate: true,
-  },
-  {
-    id: "m3n4o5p6",
-    name: "Gaming Squad",
-    description: "Find teammates and talk about your favourite games.",
-    participants: 24,
-    createdAt: "2026-06-01",
-    isPrivate: false,
-  },
-  {
-    id: "q7r8s9t0",
-    name: "Design Critique",
-    description:
-      "Share your work and get honest feedback from fellow designers.",
-    participants: 15,
-    createdAt: "2026-05-28",
-    isPrivate: false,
-  },
-  {
-    id: "u1v2w3x4",
-    name: "Startup Hub",
-    description: "Entrepreneurs and founders sharing ideas and advice.",
-    participants: 9,
-    createdAt: "2026-05-20",
-    isPrivate: true,
-  },
-];
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function generateRoomId(): string {
   return Array.from({ length: 8 }, () =>
@@ -103,17 +27,6 @@ function generateRoomId(): string {
     ),
   ).join("");
 }
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-// ─── Sub-Components ─────────────────────────────────────────────────────────
 
 function CreateRoomCard({ onCreateRoom }: { onCreateRoom: () => void }) {
   return (
@@ -228,178 +141,6 @@ function JoinRoomCard() {
     </motion.div>
   );
 }
-
-function SearchBar({
-  search,
-  setSearch,
-  filter,
-  setFilter,
-  sort,
-  setSort,
-}: {
-  search: string;
-  setSearch: (v: string) => void;
-  filter: FilterOption;
-  setFilter: (v: FilterOption) => void;
-  sort: SortOption;
-  setSort: (v: SortOption) => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center"
-    >
-      <div className="relative flex-1">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
-        <input
-          type="text"
-          placeholder="Search rooms..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-white/60 dark:bg-zinc-900/40 backdrop-blur-sm pl-10 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400/50 dark:focus:ring-zinc-600/50 focus:border-zinc-300 dark:focus:border-zinc-600 transition-all duration-300"
-        />
-      </div>
-      <div className="flex gap-3">
-        <div className="relative">
-          <SlidersHorizontal className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as FilterOption)}
-            className="appearance-none rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-white/60 dark:bg-zinc-900/40 backdrop-blur-sm pl-10 pr-8 py-3 text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-400/50 dark:focus:ring-zinc-600/50 transition-all duration-300 cursor-pointer min-w-32.5"
-          >
-            <option value="all">All Rooms</option>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-          </select>
-        </div>
-        <div className="relative">
-          <ArrowUpDown className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortOption)}
-            className="appearance-none rounded-xl border border-zinc-200 dark:border-zinc-700/60 bg-white/60 dark:bg-zinc-900/40 backdrop-blur-sm pl-10 pr-8 py-3 text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-400/50 dark:focus:ring-zinc-600/50 transition-all duration-300 cursor-pointer min-w-32.5"
-          >
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="most-active">Most Active</option>
-            <option value="name">Name</option>
-          </select>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function RoomCard({
-  room,
-  index,
-  onJoin,
-}: {
-  room: Room;
-  index: number;
-  onJoin: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-      whileHover={{ y: -4 }}
-      className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm p-5 hover:shadow-lg hover:shadow-zinc-200/20 dark:hover:shadow-black/30 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-400"
-    >
-      <div className="absolute inset-0 bg-linear-to-br from-zinc-100/50 via-transparent to-transparent dark:from-white/2 dark:via-transparent dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-zinc-900 dark:text-white truncate">
-              {room.name}
-            </h3>
-          </div>
-          <span
-            className={`ml-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium shrink-0 ${
-              room.isPrivate
-                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-            }`}
-          >
-            {room.isPrivate ? (
-              <Lock className="h-3 w-3" />
-            ) : (
-              <Globe className="h-3 w-3" />
-            )}
-            {room.isPrivate ? "Private" : "Public"}
-          </span>
-        </div>
-
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed line-clamp-2">
-          {room.description}
-        </p>
-
-        <div className="flex items-center gap-4 text-[11px] text-zinc-400 dark:text-zinc-500 mb-4">
-          <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" />
-            {room.participants}
-          </span>
-          <span className="flex items-center gap-1">
-            <CalendarDays className="h-3.5 w-3.5" />
-            {formatDate(room.createdAt)}
-          </span>
-        </div>
-
-        <motion.button
-          onClick={onJoin}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full rounded-xl bg-zinc-100 dark:bg-zinc-800/80 py-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 hover:text-zinc-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
-        >
-          <DoorOpen className="h-3.5 w-3.5" />
-          Join Room
-        </motion.button>
-      </div>
-    </motion.div>
-  );
-}
-
-function EmptyState({ onCreateRoom }: { onCreateRoom: () => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="col-span-full flex flex-col items-center justify-center py-16 sm:py-24"
-    >
-      <motion.div
-        animate={{
-          y: [-6, 6, -6],
-        }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800"
-      >
-        <Building2 className="h-10 w-10 text-zinc-300 dark:text-zinc-600" />
-      </motion.div>
-      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-        No rooms found
-      </h3>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 text-center max-w-sm">
-        There are no rooms matching your search. Be the first to create one!
-      </p>
-      <motion.button
-        onClick={onCreateRoom}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 dark:bg-white px-5 py-2.5 text-sm font-semibold text-white dark:text-black hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-all duration-300 shadow-md"
-      >
-        <Plus className="h-4 w-4" />
-        Create Room
-      </motion.button>
-    </motion.div>
-  );
-}
-
-// ─── Create Room Modal ──────────────────────────────────────────────────────
 
 type ModalStep = "form" | "created";
 
@@ -663,60 +404,11 @@ function CreateRoomModal({
   );
 }
 
-// ─── Main Page ──────────────────────────────────────────────────────────────
-
 export default function GroupPage() {
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterOption>("all");
-  const [sort, setSort] = useState<SortOption>("newest");
   const [modalOpen, setModalOpen] = useState(false);
-  const router = useRouter();
-
-  const filteredRooms = useMemo(() => {
-    let rooms = [...MOCK_ROOMS];
-
-    // Filter by search
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      rooms = rooms.filter(
-        (r) =>
-          r.name.toLowerCase().includes(q) ||
-          r.description.toLowerCase().includes(q),
-      );
-    }
-
-    // Filter by privacy
-    if (filter === "public") rooms = rooms.filter((r) => !r.isPrivate);
-    else if (filter === "private") rooms = rooms.filter((r) => r.isPrivate);
-
-    // Sort
-    switch (sort) {
-      case "newest":
-        rooms.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-        break;
-      case "oldest":
-        rooms.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
-        break;
-      case "most-active":
-        rooms.sort((a, b) => b.participants - a.participants);
-        break;
-      case "name":
-        rooms.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-    }
-
-    return rooms;
-  }, [search, filter, sort]);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      {/* Background pattern */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
@@ -736,8 +428,7 @@ export default function GroupPage() {
 
       <NavBar />
 
-      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-24 sm:pt-28">
-        {/* Header */}
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-10 sm:pt-7">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -753,53 +444,12 @@ export default function GroupPage() {
           </p>
         </motion.div>
 
-        {/* Quick Actions */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-12">
           <CreateRoomCard onCreateRoom={() => setModalOpen(true)} />
           <JoinRoomCard />
         </section>
-
-        {/* Search Section */}
-        <section className="mb-8">
-          <SearchBar
-            search={search}
-            setSearch={setSearch}
-            filter={filter}
-            setFilter={setFilter}
-            sort={sort}
-            setSort={setSort}
-          />
-        </section>
-
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-            Available Rooms
-          </h2>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">
-            {filteredRooms.length}{" "}
-            {filteredRooms.length === 1 ? "room" : "rooms"} found
-          </span>
-        </div>
-
-        {/* Rooms Grid */}
-        {filteredRooms.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredRooms.map((room, i) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                index={i}
-                onJoin={() => router.push(`/chat/${room.id}`)}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState onCreateRoom={() => setModalOpen(true)} />
-        )}
       </main>
 
-      {/* Create Room Modal */}
       <CreateRoomModal
         key={modalOpen ? "open" : "closed"}
         open={modalOpen}

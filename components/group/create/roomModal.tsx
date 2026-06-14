@@ -25,9 +25,8 @@ export default function CreateRoomModal({
 }) {
   const [step, setStep] = useState<"form" | "created">("form");
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [groupPassword, setGroupPassword] = useState("");
   const [createdRoom, setCreatedRoom] = useState<{
     id: string;
     name: string;
@@ -38,6 +37,10 @@ export default function CreateRoomModal({
   function handleCreate() {
     if (!name.trim()) {
       toast.error("Please enter a room name");
+      return;
+    }
+    if (!groupPassword.trim()) {
+      toast.error("Please enter a password for the room");
       return;
     }
     setIsCreating(true);
@@ -55,7 +58,7 @@ export default function CreateRoomModal({
 
   function handleCopyLink() {
     if (!createdRoom) return;
-    const link = `${window.location.origin}/chat/${createdRoom.id}`;
+    const link = `${window.location.origin}/group/${createdRoom.id}`;
     navigator.clipboard.writeText(link).then(() => {
       toast.success("Room link copied to clipboard!");
     });
@@ -63,7 +66,7 @@ export default function CreateRoomModal({
 
   function handleEnterRoom() {
     if (!createdRoom) return;
-    router.push(`/chat/${createdRoom.id}`);
+    router.push(`/group/${createdRoom?.id}`);
   }
 
   return (
@@ -124,52 +127,15 @@ export default function CreateRoomModal({
 
                   <div>
                     <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-                      Description{" "}
-                      <span className="text-zinc-400 dark:text-zinc-500 font-normal">
-                        (optional)
-                      </span>
+                      Room Password
                     </label>
-                    <textarea
-                      placeholder="What's this room about?"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      rows={3}
-                      className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 dark:focus:border-blue-600 transition-all duration-300 resize-none"
+                    <input
+                      type="password"
+                      placeholder="Enter a room password"
+                      value={groupPassword}
+                      onChange={(e) => setGroupPassword(e.target.value)}
+                      className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 dark:focus:border-blue-600 transition-all duration-300"
                     />
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {isPrivate ? (
-                        <Lock className="h-5 w-5 text-amber-500" />
-                      ) : (
-                        <Globe className="h-5 w-5 text-emerald-500" />
-                      )}
-                      <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                          {isPrivate ? "Private Room" : "Public Room"}
-                        </p>
-                        <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                          {isPrivate
-                            ? "Only people with the link can join"
-                            : "Anyone can discover and join"}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setIsPrivate(!isPrivate)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
-                        isPrivate
-                          ? "bg-amber-500"
-                          : "bg-zinc-300 dark:bg-zinc-600"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                          isPrivate ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
                   </div>
                 </div>
 

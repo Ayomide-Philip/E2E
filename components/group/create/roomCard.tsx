@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { LogIn, ArrowRight, Hash } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { verifyRoomId } from "@/lib/generatingRoomId";
 
 export default function JoinRoomCard() {
   const [roomId, setRoomId] = useState("");
@@ -14,12 +15,12 @@ export default function JoinRoomCard() {
       setError("Please enter a room ID");
       return;
     }
-    if (trimmed.length < 6) {
-      setError("Room ID must be at least 6 characters");
+    if (!verifyRoomId(trimmed)) {
+      setError("Invalid room ID");
       return;
     }
     setError("");
-    router.push(`/chat/${trimmed}`);
+    router.push(`/group/${trimmed}`);
   }
 
   return (

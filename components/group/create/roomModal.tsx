@@ -11,8 +11,6 @@ import {
   Hash,
   Copy,
   DoorOpen,
-  Lock,
-  Globe,
 } from "lucide-react";
 import generateRoomId from "@/lib/generatingRoomId";
 
@@ -26,7 +24,7 @@ export default function CreateRoomModal({
   const [step, setStep] = useState<"form" | "created">("form");
   const [name, setName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [groupPassword, setGroupPassword] = useState("");
+
   const [createdRoom, setCreatedRoom] = useState<{
     id: string;
     name: string;
@@ -39,10 +37,7 @@ export default function CreateRoomModal({
       toast.error("Please enter a room name");
       return;
     }
-    if (!groupPassword.trim()) {
-      toast.error("Please enter a password for the room");
-      return;
-    }
+
     setIsCreating(true);
     setTimeout(() => {
       const newRoom = {
@@ -121,19 +116,6 @@ export default function CreateRoomModal({
                       placeholder="e.g. Gaming Squad"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 dark:focus:border-blue-600 transition-all duration-300"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-                      Room Password
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Enter a room password"
-                      value={groupPassword}
-                      onChange={(e) => setGroupPassword(e.target.value)}
                       className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 dark:focus:border-blue-600 transition-all duration-300"
                     />
                   </div>

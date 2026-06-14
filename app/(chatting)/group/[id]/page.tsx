@@ -1,29 +1,20 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   Copy,
-  MoreVertical,
   Check,
   Shield,
   Lock,
-  Timer,
-  Eye,
   ImageIcon,
-  Paperclip,
   Send,
-  Smile,
-  UserPlus,
   Link2,
-  Clock,
-  Wifi,
-  WifiOff,
-  Loader2,
-  Hash,
 } from "lucide-react";
+import Toggle from "@/components/Toggle";
 
 // ─── Types ────────────────────────────────────────────────────────────
 type Message = {
@@ -32,15 +23,10 @@ type Message = {
   sender: "me" | "other" | "system";
   timestamp: Date;
   type?: "text" | "image" | "link";
-  imageUrl?: string;
   linkUrl?: string;
 };
 
-type ConnectionStatus = "connected" | "waiting" | "disconnected";
-
 // ─── Mock Data ────────────────────────────────────────────────────────
-const ROOM_NAME = "Private Chat";
-const ROOM_ID = "8xK3mZ9p";
 
 const MOCK_MESSAGES: Message[] = [
   {
@@ -73,7 +59,6 @@ const MOCK_MESSAGES: Message[] = [
     text: "Check out this screenshot of the new dashboard",
     timestamp: new Date(Date.now() - 360000),
     type: "image",
-    imageUrl: "",
   },
   {
     id: "6",
@@ -109,36 +94,28 @@ const MOCK_MESSAGES: Message[] = [
   },
 ];
 
-// ─── Typing Dots Component ────────────────────────────────────────────
+// ─── Typing Dots ──────────────────────────────────────────────────────
 function TypingDots() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      className="flex items-center gap-3 px-5 py-3"
-    >
-      <div className="flex items-center gap-1 rounded-2xl bg-zinc-100 dark:bg-zinc-800/70 px-4 py-3">
-        <motion.span
-          className="h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-500"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.2, repeat: Infinity, delay: 0 }}
-        />
-        <motion.span
-          className="h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-500"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
-        />
-        <motion.span
-          className="h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-500"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
-        />
+    <div className="flex flex-col self-start items-start max-w-[80%] sm:max-w-[70%]">
+      <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/85 rounded-tl-xs shadow-xs">
+        <div className="flex items-center gap-1">
+          {[0, 0.2, 0.4].map((delay) => (
+            <motion.span
+              key={delay}
+              animate={{ y: [0, -4, 0] }}
+              transition={{
+                repeat: Infinity,
+                duration: 0.6,
+                ease: "easeInOut",
+                delay,
+              }}
+              className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500"
+            />
+          ))}
+        </div>
       </div>
-      <span className="text-xs text-zinc-400 dark:text-zinc-500 italic">
-        Partner is typing...
-      </span>
-    </motion.div>
+    </div>
   );
 }
 
@@ -152,11 +129,11 @@ function MessageBubble({ message }: { message: Message }) {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex justify-center py-2"
+        className="flex justify-center py-1.5"
       >
-        <div className="flex items-center gap-2 rounded-full bg-zinc-100/70 dark:bg-zinc-800/50 px-4 py-1.5 backdrop-blur-sm">
+        <div className="flex items-center gap-1.5 rounded-full bg-zinc-100/70 dark:bg-zinc-800/50 px-3 py-1.5 backdrop-blur-sm">
           <Shield className="h-3 w-3 text-emerald-500" />
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
             {message.text}
           </span>
         </div>
@@ -166,50 +143,55 @@ function MessageBubble({ message }: { message: Message }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      className={`flex ${isMe ? "justify-end" : "justify-start"} px-4`}
+      variants={{
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0 },
+      }}
+      className={`flex flex-col max-w-[80%] sm:max-w-[70%] ${
+        isMe ? "self-end items-end" : "self-start items-start"
+      }`}
     >
       <div
-        className={`max-w-[85%] sm:max-w-[75%] ${
+        className={`px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs sm:text-sm leading-relaxed max-w-full ${
           isMe
-            ? "bg-linear-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20"
-            : "bg-white/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-zinc-100 shadow-lg shadow-black/5 dark:shadow-black/20 backdrop-blur-xl"
-        } rounded-2xl px-4 py-2.5 ${isMe ? "rounded-br-md" : "rounded-bl-md"}`}
+            ? "bg-zinc-900 dark:bg-white text-white dark:text-black rounded-tr-xs shadow-xs"
+            : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-800/85 rounded-tl-xs shadow-xs"
+        }`}
       >
         {message.type === "image" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-center h-32 w-full rounded-xl bg-linear-to-br from-purple-400 via-pink-400 to-orange-300 dark:from-purple-600 dark:via-pink-600 dark:to-orange-500">
-              <ImageIcon className="h-8 w-8 text-white/70" />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-center h-28 sm:h-32 w-full rounded-xl bg-linear-to-br from-purple-400 via-pink-400 to-orange-300 dark:from-purple-600 dark:via-pink-600 dark:to-orange-500">
+              <ImageIcon className="h-6 sm:h-8 w-6 sm:w-8 text-white/70" />
             </div>
-            <p className="text-sm">{message.text}</p>
+            <p className="whitespace-pre-wrap wrap-break-word">
+              {message.text}
+            </p>
           </div>
         ) : message.type === "link" ? (
           <div className="space-y-1.5">
-            <p className="text-sm">{message.text}</p>
+            <p className="whitespace-pre-wrap wrap-break-word">
+              {message.text}
+            </p>
             <a
               href={message.linkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-2 rounded-xl p-2.5 text-xs ${
+              className={`flex items-center gap-1.5 rounded-xl p-2 text-[10px] sm:text-xs ${
                 isMe
                   ? "bg-white/15 text-white hover:bg-white/20"
-                  : "bg-zinc-100 dark:bg-zinc-700/50 text-blue-600 dark:text-blue-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  : "bg-zinc-50 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
               } transition-colors duration-200`}
             >
-              <Link2 className="h-3.5 w-3.5 shrink-0" />
+              <Link2 className="h-3 sm:h-3.5 w-3 sm:w-3.5 shrink-0" />
               <span className="truncate">{message.linkUrl}</span>
             </a>
           </div>
         ) : (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
-            {message.text}
-          </p>
+          <p className="whitespace-pre-wrap wrap-break-word">{message.text}</p>
         )}
         <div
-          className={`flex items-center justify-end gap-1 mt-1 ${
-            isMe ? "text-white/60" : "text-zinc-400 dark:text-zinc-500"
+          className={`flex items-center justify-end gap-1 mt-0.5 ${
+            isMe ? "text-white/50" : "text-zinc-400 dark:text-zinc-500"
           }`}
         >
           <span className="text-[10px]">
@@ -218,11 +200,7 @@ function MessageBubble({ message }: { message: Message }) {
               minute: "2-digit",
             })}
           </span>
-          {isMe && (
-            <span className="flex">
-              <Check className="h-3 w-3" />
-            </span>
-          )}
+          {isMe && <Check className="h-3 w-3" />}
         </div>
       </div>
     </motion.div>
@@ -239,186 +217,104 @@ function WaitingScreen({ roomId }: { roomId: string }) {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function handleShare() {
-    const url = `${window.location.origin}/group/${roomId}`;
-    if (navigator.share) {
-      navigator.share({ title: "Join my private room", url });
-    } else {
-      handleCopy();
-    }
-  }
-
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center flex-1 px-6 py-12"
+      key="waiting"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3 }}
+      className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 md:p-12 text-center"
     >
-      {/* Illustration */}
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-        className="relative mb-8"
-      >
-        <div className="flex h-32 w-32 items-center justify-center rounded-full bg-linear-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-400/5 dark:via-purple-400/5 dark:pink-400/5 border border-zinc-200/50 dark:border-zinc-700/50">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 dark:from-blue-400/10 dark:via-purple-400/10 dark:pink-400/10">
-            <UserPlus className="h-10 w-10 text-blue-500 dark:text-blue-400" />
-          </div>
-        </div>
-        {/* Animated rings */}
+      <div className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-blue-400/30 dark:border-blue-500/20"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0, 0.5] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.25, 1], opacity: [0.15, 0.4, 0.15] }}
+          transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+          className="absolute w-28 h-28 sm:w-36 sm:h-36 rounded-full border border-blue-500/30 dark:border-blue-400/25"
         />
         <motion.div
-          className="absolute inset-0 rounded-full border border-purple-400/20 dark:border-purple-500/10"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] }}
           transition={{
-            duration: 3,
             repeat: Infinity,
+            duration: 3.5,
             ease: "easeInOut",
-            delay: 0.5,
+            delay: 0.6,
           }}
+          className="absolute w-22 h-22 sm:w-28 sm:h-28 rounded-full border border-purple-500/35 dark:border-purple-400/25"
         />
-      </motion.div>
+        <motion.div
+          animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{
+            repeat: Infinity,
+            duration: 3.5,
+            ease: "easeInOut",
+            delay: 1.2,
+          }}
+          className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-zinc-200 dark:border-zinc-800"
+        />
+        <motion.div
+          animate={{ y: [-4, 4, -4] }}
+          transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }}
+          className="absolute w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/25 text-white z-10"
+        >
+          <Lock className="h-5 w-5 sm:h-6 sm:w-6" />
+        </motion.div>
+      </div>
 
-      <motion.h2
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-2xl font-bold text-zinc-900 dark:text-white mb-2"
-      >
+      <h2 className="text-base sm:text-xl md:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight mb-1.5 sm:mb-2 px-2">
         Waiting for someone to join...
-      </motion.h2>
+      </h2>
 
-      <motion.p
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-xs mb-8"
-      >
-        Share the room link or ID with your partner to start a private
-        conversation.
-      </motion.p>
+      <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mb-6 sm:mb-8 leading-relaxed px-4 sm:px-0">
+        Share this link with a friend to start chatting. The session remains
+        temporary and encrypted.
+      </p>
 
-      {/* Room ID Card */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="w-full max-w-sm rounded-2xl border border-zinc-200/60 dark:border-zinc-700/60 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-5 mb-6"
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-purple-600 shadow-lg">
-            <Hash className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Room ID</p>
-            <p className="text-sm font-mono font-semibold text-zinc-900 dark:text-white">
-              {roomId}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-2">
-          <motion.button
+      <div className="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-3 sm:p-4 w-full max-w-md text-left shadow-xs mx-4 sm:mx-0">
+        <span className="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 mb-2 uppercase tracking-wider">
+          Shareable Room Link
+        </span>
+        <div className="flex items-center gap-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-xl p-1 shadow-xs">
+          <input
+            type="text"
+            readOnly
+            value={`${typeof window !== "undefined" ? window.location.origin : ""}/group/${roomId}`}
+            className="flex-1 text-[10px] sm:text-xs font-mono text-zinc-600 dark:text-zinc-350 px-2 select-all outline-none truncate"
+          />
+          <button
             onClick={handleCopy}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 dark:border-zinc-700 py-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-300"
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer shrink-0 ${
+              copied
+                ? "bg-emerald-500 text-white shadow-xs"
+                : "bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100"
+            }`}
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-500" />
-                Copied!
+                <Check className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
+                <span className="hidden sm:inline">Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5" />
-                Copy Room Link
+                <Copy className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
+                <span className="hidden sm:inline">Copy</span>
               </>
             )}
-          </motion.button>
-          <motion.button
-            onClick={handleShare}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 dark:bg-white py-2.5 text-xs font-semibold text-white dark:text-black hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-all duration-300"
-          >
-            <UserPlus className="h-3.5 w-3.5" />
-            Share Room
-          </motion.button>
-        </div>
-      </motion.div>
-
-      {/* Status */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="flex items-center gap-2"
-      >
-        <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-        <span className="text-xs text-zinc-400 dark:text-zinc-500">
-          Waiting for participant...
-        </span>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-// ─── Security Banner ──────────────────────────────────────────────────
-function SecurityBanner() {
-  return (
-    <motion.div
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "auto", opacity: 1 }}
-      className="overflow-hidden border-b border-zinc-200/50 dark:border-zinc-800/50"
-    >
-      <div className="px-4 py-3">
-        <div className="flex flex-wrap items-center justify-center gap-3 rounded-xl bg-linear-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 dark:from-emerald-400/5 dark:via-emerald-400/10 dark:to-emerald-400/5 border border-emerald-200/50 dark:border-emerald-800/50 px-4 py-2.5 backdrop-blur-sm">
-          <div className="flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
-              End-to-End Encrypted
-            </span>
-          </div>
-          <div className="hidden sm:block h-3 w-px bg-zinc-200 dark:bg-zinc-700" />
-          <div className="flex items-center gap-2">
-            <Timer className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
-              Temporary Room
-            </span>
-          </div>
-          <div className="hidden sm:block h-3 w-px bg-zinc-200 dark:bg-zinc-700" />
-          <div className="flex items-center gap-2">
-            <Eye className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
-              Private Conversation
-            </span>
-          </div>
+          </button>
         </div>
       </div>
     </motion.div>
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────
 export default function Page() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
   const [input, setInput] = useState("");
-  const [status, setStatus] = useState<ConnectionStatus>("connected");
   const [isPartnerTyping, setIsPartnerTyping] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Simulate partner typing
   useEffect(() => {
@@ -434,25 +330,14 @@ export default function Page() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isPartnerTyping]);
 
-  // Close menu on outside click
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setShowMenu(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
   // Auto-grow textarea
-  function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    setInput(e.target.value);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
     }
-  }
+  }, [input]);
 
   function handleSend() {
     if (!input.trim()) return;
@@ -464,13 +349,10 @@ export default function Page() {
     };
     setMessages((prev) => [...prev, newMsg]);
     setInput("");
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && input.trim()) {
       e.preventDefault();
       handleSend();
     }
@@ -480,216 +362,192 @@ export default function Page() {
     navigator.clipboard.writeText(`${window.location.origin}/group/${id}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast("Room link copied!");
   }
 
-  // Simple toast
-  function toast(msg: string) {
-    const el = document.createElement("div");
-    el.className =
-      "fixed bottom-24 left-1/2 -translate-x-1/2 z-50 rounded-xl bg-zinc-900 dark:bg-white px-4 py-2 text-sm text-white dark:text-black shadow-2xl animate-fade-in";
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2000);
-  }
-
-  const statusConfig = {
-    connected: {
-      label: "Connected",
-      icon: Wifi,
-      color: "text-emerald-500",
-      bg: "bg-emerald-500/10",
-      dot: "bg-emerald-500",
-    },
-    waiting: {
-      label: "Waiting for partner",
-      icon: Loader2,
-      color: "text-amber-500",
-      bg: "bg-amber-500/10",
-      dot: "bg-amber-500",
-    },
-    disconnected: {
-      label: "Disconnected",
-      icon: WifiOff,
-      color: "text-red-500",
-      bg: "bg-red-500/10",
-      dot: "bg-red-500",
-    },
-  };
-
-  const statusInfo = statusConfig[status];
-  const StatusIcon = statusInfo.icon;
-
-  const waitingState = status === "waiting" || messages.length < 3;
+  const isPartnerJoined = true;
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-50 dark:bg-black">
-      {/* ─── Sticky Header ─────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-4 h-16">
-          {/* Left: Back + Info */}
-          <div className="flex items-center gap-3 min-w-0">
-            <motion.button
-              onClick={() => router.back()}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
+    <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
+      {/* Background dot pattern */}
+      <div
+        className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #d4d4d8 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      <div
+        className="absolute inset-0 hidden dark:block pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #27272a 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      {/* ─── Navbar (matching chat/[id] style) ──────── */}
+      <div className="relative z-20 w-full px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-3 shrink-0">
+        <nav className="mx-auto flex w-full items-center justify-between gap-2 sm:gap-4 rounded-2xl sm:rounded-full px-3 sm:px-5 py-2.5 sm:py-3 bg-white/80 dark:bg-zinc-950/60 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+          {/* Left */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Link
+              href="/"
+              className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white shrink-0"
+              title="Leave Room"
             >
-              <ArrowLeft className="h-5 w-5" />
-            </motion.button>
-            <div className="min-w-0">
-              <h1 className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
-                {ROOM_NAME}
-              </h1>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
-                  ID: {id}
-                </span>
-                <span className="text-[10px] text-zinc-300 dark:text-zinc-600">
-                  ·
-                </span>
-                <div className="flex items-center gap-1">
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${statusInfo.dot} animate-pulse`}
-                  />
-                  <span
-                    className={`text-[11px] font-medium ${statusInfo.color}`}
-                  >
-                    {statusInfo.label}
-                  </span>
-                </div>
-              </div>
+              <ArrowLeft className="h-3.5 w-3.5" />
+            </Link>
+
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Lock className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
+              <span className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
+                Group
+              </span>
+              <span className="hidden sm:inline-flex bg-linear-to-br from-blue-500 to-purple-600 text-[9px] text-white px-1.5 py-0.5 rounded-full font-bold">
+                E2E
+              </span>
             </div>
           </div>
 
-          {/* Right: Actions */}
-          <div className="flex items-center gap-1">
-            <motion.button
-              onClick={handleCopyLink}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
-              title="Copy Link"
-            >
-              {copied ? (
-                <Check className="h-4 w-4 text-emerald-500" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </motion.button>
-
-            {/* More Menu */}
-            <div ref={menuRef} className="relative">
-              <motion.button
-                onClick={() => setShowMenu(!showMenu)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </motion.button>
-              <AnimatePresence>
-                {showMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: -5 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -5 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl shadow-xl overflow-hidden"
-                  >
-                    {[
-                      { label: "Clear Chat", icon: Clock },
-                      { label: "Report Room", icon: Eye },
-                      { label: "Leave Room", icon: ArrowLeft },
-                    ].map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={() => setShowMenu(false)}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
-                      >
-                        <item.icon className="h-4 w-4 text-zinc-400" />
-                        {item.label}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* ─── Security Banner ───────────────────────── */}
-      <SecurityBanner />
-
-      {/* ─── Chat Area / Waiting State ─────────────── */}
-      <main className="flex-1 overflow-y-auto">
-        {waitingState ? (
-          <WaitingScreen roomId={id} />
-        ) : (
-          <div className="py-4 space-y-1">
-            {/* Date separator */}
-            <div className="flex justify-center py-3">
-              <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500 bg-zinc-100/70 dark:bg-zinc-800/50 px-3 py-1 rounded-full backdrop-blur-sm">
-                Today
+          {/* Center: Room ID + Status (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-2 min-w-0 flex-1 justify-center">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 text-[10px] font-mono rounded-full border border-zinc-200 dark:border-zinc-800 min-w-0 max-w-45 md:max-w-60">
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:text-zinc-600 shrink-0" />
+              <span className="truncate" title={id}>
+                {id}
               </span>
             </div>
 
-            {messages.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} />
-            ))}
-
-            {/* Typing Indicator */}
-            <AnimatePresence>
-              {isPartnerTyping && <TypingDots />}
-            </AnimatePresence>
-
-            <div ref={messagesEndRef} />
+            <motion.div
+              key={isPartnerJoined ? "connected" : "waiting"}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all shrink-0 ${
+                isPartnerJoined
+                  ? "bg-emerald-500/10 text-emerald-700 border-emerald-200/60 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800/40"
+                  : "bg-amber-500/10 text-amber-700 border-amber-200/60 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-800/40"
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full shrink-0 animate-pulse ${
+                  isPartnerJoined ? "bg-emerald-500" : "bg-amber-500"
+                }`}
+              />
+              <span>{isPartnerJoined ? "Connected" : "Waiting..."}</span>
+            </motion.div>
           </div>
+
+          {/* Mobile status dot */}
+          <div className="sm:hidden flex items-center">
+            <span
+              className={`w-2 h-2 rounded-full animate-pulse shrink-0 ${
+                isPartnerJoined ? "bg-emerald-500" : "bg-amber-500"
+              }`}
+              title={isPartnerJoined ? "Connected" : "Waiting for peer..."}
+            />
+          </div>
+
+          {/* Right */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              onClick={handleCopyLink}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-semibold border transition-all cursor-pointer ${
+                copied
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              }`}
+              title="Copy Room Link"
+            >
+              {copied ? (
+                <Check className="h-3 w-3 shrink-0" />
+              ) : (
+                <Copy className="h-3 w-3 shrink-0" />
+              )}
+              <span className="hidden md:inline">
+                {copied ? "Copied!" : "Copy Link"}
+              </span>
+            </button>
+
+            <div className="p-1.5 sm:p-2 rounded-full border bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center">
+              <Toggle />
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      {/* ─── Security Banner ───────────────────────── */}
+
+      {/* ─── Chat Area / Waiting State ─────────────── */}
+      <main className="relative z-10 flex-1 flex flex-col min-h-0">
+        {!isPartnerJoined ? (
+          <WaitingScreen roomId={id} />
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
+              {/* Security badge */}
+              <div className="flex items-center justify-center mb-4 sm:mb-6">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500/10 dark:bg-emerald-400/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl text-[10px] sm:text-xs max-w-[90%] sm:max-w-md text-center shadow-xs">
+                  <Shield className="h-3 sm:h-3.5 w-3 sm:w-3.5 shrink-0" />
+                  <span>End-to-end encrypted chat</span>
+                </div>
+              </div>
+
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: { staggerChildren: 0.12 },
+                  },
+                }}
+                className="flex flex-col gap-4"
+              >
+                {messages.map((msg) => (
+                  <MessageBubble key={msg.id} message={msg} />
+                ))}
+              </motion.div>
+
+              {/* Typing Indicator */}
+              <AnimatePresence>
+                {isPartnerTyping && <TypingDots />}
+              </AnimatePresence>
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* ─── Message Composer ────────────────────── */}
+            <div className="p-2 sm:p-3 md:p-4 bg-linear-to-t from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 dark:to-transparent shrink-0 border-t border-zinc-200/80 dark:border-zinc-800/60">
+              <div className="flex items-center gap-1.5 sm:gap-2 max-w-4xl mx-auto bg-white dark:bg-zinc-900 backdrop-blur-md rounded-xl sm:rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_4px_20px_rgb(0,0,0,0.04)] dark:shadow-none p-1 sm:p-1.5">
+                <textarea
+                  ref={textareaRef}
+                  placeholder="Type a message..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  rows={1}
+                  className="flex-1 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-transparent border-0 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 resize-none min-h-9 sm:min-h-10 max-h-40 leading-relaxed"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className={`h-9 sm:h-10 px-3 sm:px-4 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center gap-1 sm:gap-1.5 shrink-0 ${
+                    input.trim()
+                      ? "bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-700 dark:hover:bg-zinc-100 cursor-pointer shadow-sm active:scale-[0.96]"
+                      : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed opacity-60"
+                  }`}
+                >
+                  <Send className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
+                  <span className="hidden sm:inline">Send</span>
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </main>
-
-      {/* ─── Message Composer ──────────────────────── */}
-      {!waitingState && (
-        <motion.div
-          initial={{ y: 50 }}
-          animate={{ y: 0 }}
-          className="sticky bottom-0 border-t border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl px-4 py-3"
-        >
-          <div className="flex items-end gap-2 max-w-4xl mx-auto">
-            <div className="flex items-center gap-1">
-              <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200">
-                <Smile className="h-5 w-5" />
-              </button>
-              <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200">
-                <Paperclip className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 relative">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a message..."
-                rows={1}
-                className="w-full resize-none rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 px-4 py-2.5 pr-12 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 dark:focus:border-blue-600 transition-all duration-300 max-h-[120px]"
-              />
-            </div>
-
-            <motion.button
-              onClick={handleSend}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              disabled={!input.trim()}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300"
-            >
-              <Send className="h-4 w-4" />
-            </motion.button>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

@@ -8,6 +8,8 @@ const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
 const rooms: Record<string, Set<WebSocket>> = {};
 const clientsRoom = new Map<WebSocket, string>();
+const groups: Record<string, { name: string; password?: string }> = {};
+const clientsGroup = new Map<WebSocket, string>();
 const clientsPublicKeys = new Map<WebSocket, string>();
 
 app.prepare().then(() => {
@@ -126,6 +128,21 @@ app.prepare().then(() => {
         for (const client of rooms[roomId]) {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({ type: "call-ended" }));
+          }
+        }
+      } else if (m.type === "join-room") {
+        const { roomId, roomName, roomPassword } = m;
+
+        if (!groups[roomId]) {
+          if (!roomName || !roomPassword) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Room name and password are required to create a room",
+              }),
+            );
+            ws.close();
+            return;
           }
         }
       }

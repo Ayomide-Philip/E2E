@@ -22,24 +22,7 @@ export default function ChatLandingPage() {
   };
 
   return (
-    <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
-      <div
-        className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, #d4d4d8 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-      <div
-        className="absolute inset-0 hidden dark:block pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, #27272a 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-
+    <>
       <NavBar />
 
       <div className="relative z-10 flex-1 flex items-center justify-center p-4">
@@ -112,6 +95,6 @@ export default function ChatLandingPage() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </>
   );
 }

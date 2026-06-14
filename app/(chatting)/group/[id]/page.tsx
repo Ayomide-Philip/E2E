@@ -4,19 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowLeft,
-  Copy,
-  Check,
-  Shield,
-  Lock,
-  ImageIcon,
-  Send,
-  Link2,
-} from "lucide-react";
+import { ArrowLeft, Copy, Check, Shield, Lock, Send } from "lucide-react";
 import Toggle from "@/components/Toggle";
 import WaitingScreen from "@/components/group/chat/waitingState";
 import TypingDots from "@/components/typingDot";
+import MessageBubble from "@/components/group/chat/messageBubble";
 
 type Message = {
   id: string;
@@ -93,94 +85,6 @@ const MOCK_MESSAGES: Message[] = [
   },
 ];
 
-// ─── Message Bubble ───────────────────────────────────────────────────
-function MessageBubble({ message }: { message: Message }) {
-  const isMe = message.sender === "me";
-  const isSystem = message.sender === "system";
-
-  if (isSystem) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-center py-1.5"
-      >
-        <div className="flex items-center gap-1.5 rounded-full bg-zinc-100/70 dark:bg-zinc-800/50 px-3 py-1.5 backdrop-blur-sm">
-          <Shield className="h-3 w-3 text-emerald-500" />
-          <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
-            {message.text}
-          </span>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, y: 10 },
-        show: { opacity: 1, y: 0 },
-      }}
-      className={`flex flex-col max-w-[80%] sm:max-w-[70%] ${
-        isMe ? "self-end items-end" : "self-start items-start"
-      }`}
-    >
-      <div
-        className={`px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs sm:text-sm leading-relaxed max-w-full ${
-          isMe
-            ? "bg-zinc-900 dark:bg-white text-white dark:text-black rounded-tr-xs shadow-xs"
-            : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-800/85 rounded-tl-xs shadow-xs"
-        }`}
-      >
-        {message.type === "image" ? (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-center h-28 sm:h-32 w-full rounded-xl bg-linear-to-br from-purple-400 via-pink-400 to-orange-300 dark:from-purple-600 dark:via-pink-600 dark:to-orange-500">
-              <ImageIcon className="h-6 sm:h-8 w-6 sm:w-8 text-white/70" />
-            </div>
-            <p className="whitespace-pre-wrap wrap-break-word">
-              {message.text}
-            </p>
-          </div>
-        ) : message.type === "link" ? (
-          <div className="space-y-1.5">
-            <p className="whitespace-pre-wrap wrap-break-word">
-              {message.text}
-            </p>
-            <a
-              href={message.linkUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center gap-1.5 rounded-xl p-2 text-[10px] sm:text-xs ${
-                isMe
-                  ? "bg-white/15 text-white hover:bg-white/20"
-                  : "bg-zinc-50 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
-              } transition-colors duration-200`}
-            >
-              <Link2 className="h-3 sm:h-3.5 w-3 sm:w-3.5 shrink-0" />
-              <span className="truncate">{message.linkUrl}</span>
-            </a>
-          </div>
-        ) : (
-          <p className="whitespace-pre-wrap wrap-break-word">{message.text}</p>
-        )}
-        <div
-          className={`flex items-center justify-end gap-1 mt-0.5 ${
-            isMe ? "text-white/50" : "text-zinc-400 dark:text-zinc-500"
-          }`}
-        >
-          <span className="text-[10px]">
-            {message.timestamp.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
-          {isMe && <Check className="h-3 w-3" />}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function Page() {
   const { id } = useParams<{ id: string }>();
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
@@ -242,7 +146,6 @@ export default function Page() {
 
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
-      {/* Background dot pattern */}
       <div
         className="absolute inset-0 bg-linear-to-br from-white via-zinc-50 to-white dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black pointer-events-none"
         style={{
@@ -260,10 +163,8 @@ export default function Page() {
         }}
       />
 
-      {/* ─── Navbar (matching chat/[id] style) ──────── */}
       <div className="relative z-20 w-full px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-3 shrink-0">
         <nav className="mx-auto flex w-full items-center justify-between gap-2 sm:gap-4 rounded-2xl sm:rounded-full px-3 sm:px-5 py-2.5 sm:py-3 bg-white/80 dark:bg-zinc-950/60 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
-          {/* Left */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link
               href="/"
@@ -284,7 +185,6 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Center: Room ID + Status (hidden on mobile) */}
           <div className="hidden sm:flex items-center gap-2 min-w-0 flex-1 justify-center">
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 text-[10px] font-mono rounded-full border border-zinc-200 dark:border-zinc-800 min-w-0 max-w-45 md:max-w-60">
               <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:text-zinc-600 shrink-0" />
@@ -313,7 +213,6 @@ export default function Page() {
             </motion.div>
           </div>
 
-          {/* Mobile status dot */}
           <div className="sm:hidden flex items-center">
             <span
               className={`w-2 h-2 rounded-full animate-pulse shrink-0 ${
@@ -323,7 +222,6 @@ export default function Page() {
             />
           </div>
 
-          {/* Right */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={handleCopyLink}
@@ -351,16 +249,12 @@ export default function Page() {
         </nav>
       </div>
 
-      {/* ─── Security Banner ───────────────────────── */}
-
-      {/* ─── Chat Area / Waiting State ─────────────── */}
       <main className="relative z-10 flex-1 flex flex-col min-h-0">
         {!isPartnerJoined ? (
           <WaitingScreen roomId={id} />
         ) : (
           <>
             <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
-              {/* Security badge */}
               <div className="flex items-center justify-center mb-4 sm:mb-6">
                 <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500/10 dark:bg-emerald-400/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/10 rounded-2xl text-[10px] sm:text-xs max-w-[90%] sm:max-w-md text-center shadow-xs">
                   <Shield className="h-3 sm:h-3.5 w-3 sm:w-3.5 shrink-0" />
@@ -385,7 +279,6 @@ export default function Page() {
                 ))}
               </motion.div>
 
-              {/* Typing Indicator */}
               <AnimatePresence>
                 {isPartnerTyping && <TypingDots />}
               </AnimatePresence>
@@ -393,7 +286,6 @@ export default function Page() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* ─── Message Composer ────────────────────── */}
             <div className="p-2 sm:p-3 md:p-4 bg-linear-to-t from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 dark:to-transparent shrink-0 border-t border-zinc-200/80 dark:border-zinc-800/60">
               <div className="flex items-center gap-1.5 sm:gap-2 max-w-4xl mx-auto bg-white dark:bg-zinc-900 backdrop-blur-md rounded-xl sm:rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-[0_4px_20px_rgb(0,0,0,0.04)] dark:shadow-none p-1 sm:p-1.5">
                 <textarea

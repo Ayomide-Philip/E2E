@@ -11,26 +11,8 @@ export default function GroupPage() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, #d4d4d8 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-      <div
-        className="fixed inset-0 pointer-events-none hidden dark:block"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, #27272a 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-
+    <>
       <NavBar />
-
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-10 sm:pt-7">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -58,6 +40,6 @@ export default function GroupPage() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
       />
-    </div>
+    </>
   );
 }

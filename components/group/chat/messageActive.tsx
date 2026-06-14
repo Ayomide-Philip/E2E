@@ -7,7 +7,6 @@ import { useRef, useEffect } from "react";
 export default function MessageActive({
   messages,
   isPartnerTyping,
-
   input,
   setInput,
   handleKeyDown,
@@ -22,12 +21,11 @@ export default function MessageActive({
 }) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  // Auto-scroll to bottom
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isPartnerTyping]);
 
-  // Auto-grow textarea
   useEffect(() => {
     const el = textareaRef.current;
     if (el) {
@@ -35,6 +33,7 @@ export default function MessageActive({
       el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
     }
   }, [input]);
+
   return (
     <>
       <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">

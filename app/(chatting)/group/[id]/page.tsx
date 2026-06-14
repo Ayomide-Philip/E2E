@@ -15,75 +15,9 @@ export type Message = {
   linkUrl?: string;
 };
 
-const MOCK_MESSAGES: Message[] = [
-  {
-    id: "1",
-    sender: "system",
-    text: "You joined this private room",
-    timestamp: new Date(Date.now() - 600000),
-  },
-  {
-    id: "2",
-    sender: "other",
-    text: "Hey! Glad you made it. This room is completely private and secure.",
-    timestamp: new Date(Date.now() - 540000),
-  },
-  {
-    id: "3",
-    sender: "me",
-    text: "Awesome, thanks for setting this up! 🔥",
-    timestamp: new Date(Date.now() - 480000),
-  },
-  {
-    id: "4",
-    sender: "other",
-    text: "Of course! I wanted to share the project files with you. The new design system is looking incredible. I've been working on the component library and I think you'll really like what we've put together so far.",
-    timestamp: new Date(Date.now() - 420000),
-  },
-  {
-    id: "5",
-    sender: "other",
-    text: "Check out this screenshot of the new dashboard",
-    timestamp: new Date(Date.now() - 360000),
-    type: "image",
-  },
-  {
-    id: "6",
-    sender: "me",
-    text: "That looks dope! The gradient work is clean. Here's the figma link:",
-    timestamp: new Date(Date.now() - 300000),
-    type: "link",
-    linkUrl: "https://figma.com/file/demo",
-  },
-  {
-    id: "7",
-    sender: "other",
-    text: "Perfect, I'll check it out. Also, we should discuss the API integration for the real-time features.",
-    timestamp: new Date(Date.now() - 240000),
-  },
-  {
-    id: "8",
-    sender: "me",
-    text: "Sounds good. Let me know when you're free tomorrow!",
-    timestamp: new Date(Date.now() - 180000),
-  },
-  {
-    id: "9",
-    sender: "other",
-    text: "Will do. Talk to you later! 👋",
-    timestamp: new Date(Date.now() - 120000),
-  },
-  {
-    id: "10",
-    sender: "system",
-    text: "Messages are end-to-end encrypted",
-    timestamp: new Date(Date.now() - 60000),
-  },
-];
-
 export default function Page() {
   const { id } = useParams<{ id: string }>();
-  const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isPartnerTyping, setIsPartnerTyping] = useState(false);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import WaitingScreen from "@/components/group/chat/waitingState";
 import MessageActive from "@/components/group/chat/messageActive";
@@ -20,7 +20,9 @@ export default function Page() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isPartnerTyping, setIsPartnerTyping] = useState(false);
-
+  const socketRef = useRef<WebSocket | null>(null);
+  const [groupPassword, setGroupPassword] = useState<string | null>(null);
+  const [startGroupChat, setStartGroupChat] = useState<boolean>(false);
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPartnerTyping(true);
@@ -47,6 +49,17 @@ export default function Page() {
       handleSend();
     }
   }
+
+  useEffect(() => {
+    if (!window) return;
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const host = window.location.host;
+    socketRef.current = new WebSocket(`${protocol}://${host}/api/ws`);
+
+    socketRef.current.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+  }, []);
 
   const isPartnerJoined = true;
 

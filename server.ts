@@ -8,7 +8,7 @@ const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
 const rooms: Record<string, Set<WebSocket>> = {};
 const clientsRoom = new Map<WebSocket, string>();
-const groups: Record<string, { name: string; password?: string }> = {};
+const groups: Record<string, { password?: string }> = {};
 const clientsPublicKeys = new Map<WebSocket, string>();
 
 app.prepare().then(() => {
@@ -130,10 +130,10 @@ app.prepare().then(() => {
           }
         }
       } else if (m.type === "join-room") {
-        const { roomId, roomName, roomPassword } = m;
+        const { roomId, roomPassword } = m;
 
         if (!groups[roomId]) {
-          if (!roomName || !roomPassword) {
+          if (!roomPassword) {
             ws.send(
               JSON.stringify({
                 type: "error",
@@ -143,7 +143,7 @@ app.prepare().then(() => {
             ws.close();
             return;
           }
-          groups[roomId] = { name: roomName, password: roomPassword };
+          groups[roomId] = { password: roomPassword };
           rooms[roomId] = new Set();
         } else {
           if (
@@ -169,7 +169,6 @@ app.prepare().then(() => {
               JSON.stringify({
                 type: "peer-joined",
                 count: rooms[roomId].size,
-                name: groups[roomId].name,
               }),
             );
           }

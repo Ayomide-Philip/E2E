@@ -61,20 +61,13 @@ export default function Page() {
   }
 
   function handlePasswordSubmit(password: string) {
-    // Look up the mock password for this room
-    const expectedPassword = getMockRoomPassword(id) ?? DEFAULT_MOCK_PASSWORD;
-
-    // Simulate a brief validation delay
-    setTimeout(() => {
-      if (password === expectedPassword) {
-        setGroupPassword(password);
-        setPasswordError(null);
-        setPasswordModalOpen(false);
-        setStartGroupChat(true);
-      } else {
-        setPasswordError("Incorrect password. Please try again.");
-      }
-    }, 800);
+    socketRef.current?.send(
+      JSON.stringify({
+        type: "join_group",
+        roomId: id,
+        password,
+      }),
+    );
   }
 
   useEffect(() => {
@@ -109,9 +102,7 @@ export default function Page() {
           backgroundSize: "40px 40px",
         }}
       />
-
       <GroupNavBar id={id} isPartnerJoined={isPartnerJoined} />
-
       <main className="relative z-10 flex-1 flex flex-col min-h-0">
         {!isPartnerJoined ? (
           <WaitingScreen roomId={id} />
@@ -135,8 +126,6 @@ export default function Page() {
         error={passwordError}
         isLoading={false}
       />
-
-      {/* Password info badge — visible after successful entry */}
       {groupPassword && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
           <button
@@ -152,6 +141,7 @@ export default function Page() {
             )}
           </button>
         </div>
-      )}    </div>
+      )}{" "}
+    </div>
   );
 }

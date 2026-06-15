@@ -1,11 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
+import { Lock } from "lucide-react";
 import WaitingScreen from "@/components/group/chat/waitingState";
 import MessageActive from "@/components/group/chat/messageActive";
 import GroupNavBar from "@/components/group/chat/navbar";
+import PasswordModal from "@/components/group/chat/passwordModal";
+import {
+  getMockRoomPassword,
+  DEFAULT_MOCK_PASSWORD,
+} from "@/lib/mockRoomPasswords";
 
 export type Message = {
   id: string;
@@ -22,8 +27,11 @@ export default function Page() {
   const [input, setInput] = useState("");
   const [isPartnerTyping, setIsPartnerTyping] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(true);
   const [groupPassword, setGroupPassword] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [startGroupChat, setStartGroupChat] = useState<boolean>(false);
+  const [showPasswordInfo, setShowPasswordInfo] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,6 +58,23 @@ export default function Page() {
       e.preventDefault();
       handleSend();
     }
+  }
+
+  function handlePasswordSubmit(password: string) {
+    // Look up the mock password for this room
+    const expectedPassword = getMockRoomPassword(id) ?? DEFAULT_MOCK_PASSWORD;
+
+    // Simulate a brief validation delay
+    setTimeout(() => {
+      if (password === expectedPassword) {
+        setGroupPassword(password);
+        setPasswordError(null);
+        setPasswordModalOpen(false);
+        setStartGroupChat(true);
+      } else {
+        setPasswordError("Incorrect password. Please try again.");
+      }
+    }, 800);
   }
 
   useEffect(() => {
@@ -101,6 +126,32 @@ export default function Page() {
           />
         )}
       </main>
-    </div>
+      {/* Password Modal */}
+      <PasswordModal
+        open={passwordModalOpen}
+        roomId={id}
+        onPasswordSubmit={handlePasswordSubmit}
+        onClose={() => setPasswordModalOpen(false)}
+        error={passwordError}
+        isLoading={false}
+      />
+
+      {/* Password info badge — visible after successful entry */}
+      {groupPassword && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+          <button
+            onClick={() => setShowPasswordInfo((prev) => !prev)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 dark:bg-white/10 backdrop-blur-xl border border-zinc-700/50 dark:border-zinc-600/30 text-[11px] text-zinc-400 dark:text-zinc-500 hover:text-zinc-300 dark:hover:text-zinc-300 transition-all"
+          >
+            <Lock className="h-3 w-3" />
+            <span>Room secured</span>
+            {showPasswordInfo && (
+              <span className="font-mono text-violet-400 dark:text-violet-300">
+                {groupPassword}
+              </span>
+            )}
+          </button>
+        </div>
+      )}    </div>
   );
 }

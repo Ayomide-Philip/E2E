@@ -7,10 +7,6 @@ import WaitingScreen from "@/components/group/chat/waitingState";
 import MessageActive from "@/components/group/chat/messageActive";
 import GroupNavBar from "@/components/group/chat/navbar";
 import PasswordModal from "@/components/group/chat/passwordModal";
-import {
-  getMockRoomPassword,
-  DEFAULT_MOCK_PASSWORD,
-} from "@/lib/mockRoomPasswords";
 
 export type Message = {
   id: string;
@@ -117,12 +113,16 @@ export default function Page() {
           />
         )}
       </main>
-      {/* Password Modal */}
       <PasswordModal
         open={passwordModalOpen}
         roomId={id}
         onPasswordSubmit={handlePasswordSubmit}
-        onClose={() => setPasswordModalOpen(false)}
+        onClose={() => {
+          if (!startGroupChat) {
+            return setPasswordModalOpen(true);
+          }
+          return setPasswordModalOpen(false);
+        }}
         error={passwordError}
         isLoading={false}
       />

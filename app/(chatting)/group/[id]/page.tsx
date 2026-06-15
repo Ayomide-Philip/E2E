@@ -7,7 +7,7 @@ import WaitingScreen from "@/components/group/chat/waitingState";
 import MessageActive from "@/components/group/chat/messageActive";
 import GroupNavBar from "@/components/group/chat/navbar";
 import PasswordModal from "@/components/group/chat/passwordModal";
-
+import { toast } from "sonner";
 export type Message = {
   id: string;
   text: string;
@@ -25,9 +25,9 @@ export default function Page() {
   const socketRef = useRef<WebSocket | null>(null);
   const [passwordModalOpen, setPasswordModalOpen] = useState(true);
   const [groupPassword, setGroupPassword] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [startGroupChat, setStartGroupChat] = useState<boolean>(false);
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,18 +57,25 @@ export default function Page() {
   }
 
   function handlePasswordSubmit(password: string) {
-    socketRef.current?.send(
-      JSON.stringify({
-        type: "join_group",
-        roomId: id,
-        roomPassword: password,
-      }),
-    );
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
+        JSON.stringify({
+          type: "join-room",
+          roomId: id,
+          roomPassword: password,
+        }),
+      );
+    } else {
+      console.log(
+        "Socket not ready yet, state:",
+        socketRef.current?.readyState,
+      );
+      return toast.error("Connecting to server. Please try again.");
+    }
   }
 
   useEffect(() => {
-    if (!window || !groupPassword?.trim() || groupPassword?.trim().length < 6)
-      return;
+    if (!window) return;
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const host = window.location.host;
     socketRef.current = new WebSocket(`${protocol}://${host}/api/ws`);
@@ -83,9 +90,21 @@ export default function Page() {
       if (message.type === "joined-room") {
         setStartGroupChat(true);
         setPasswordModalOpen(false);
+        toast.success("Joined room successfully!");
+        if (message.count > 1) {
+          setStartGroupChat(true);
+        }
+      }
+
+      if (message?.type === "require-password") {
+        setPasswordError("Incorrect password. Please try again.");
       }
     };
-  }, [groupPassword, startGroupChat]);
+
+    return () => {
+      socketRef.current?.close();
+    };
+  }, []);
 
   const isPartnerJoined = true;
 
@@ -125,15 +144,8 @@ export default function Page() {
       <PasswordModal
         open={passwordModalOpen}
         roomId={id}
-        onPasswordSubmit={() => {
-          handlePasswordSubmit(groupPassword || "");
-        }}
-        onClose={() => {
-          if (!startGroupChat) {
-            return setPasswordModalOpen(true);
-          }
-          return setPasswordModalOpen(false);
-        }}
+        onPasswordSubmit={handlePasswordSubmit}
+        onClose={() => setPasswordModalOpen(false)}
         error={passwordError}
         isLoading={false}
         groupPassword={groupPassword}

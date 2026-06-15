@@ -3,7 +3,6 @@ import { WebSocketServer, WebSocket } from "ws";
 import next from "next";
 import { parse } from "node:url";
 import { Socket } from "node:net";
-import { count } from "node:console";
 
 const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();

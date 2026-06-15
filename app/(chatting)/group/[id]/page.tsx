@@ -61,7 +61,7 @@ export default function Page() {
       JSON.stringify({
         type: "join_group",
         roomId: id,
-        password,
+        roomPassword: password,
       }),
     );
   }
@@ -75,6 +75,15 @@ export default function Page() {
 
     socketRef.current.onopen = () => {
       console.log("WebSocket connection established");
+    };
+
+    socketRef.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type === "joined-room") {
+        setStartGroupChat(true);
+        setPasswordModalOpen(false);
+      }
     };
   }, [groupPassword, startGroupChat]);
 
@@ -116,7 +125,9 @@ export default function Page() {
       <PasswordModal
         open={passwordModalOpen}
         roomId={id}
-        onPasswordSubmit={handlePasswordSubmit}
+        onPasswordSubmit={() => {
+          handlePasswordSubmit(groupPassword || "");
+        }}
         onClose={() => {
           if (!startGroupChat) {
             return setPasswordModalOpen(true);
@@ -125,6 +136,8 @@ export default function Page() {
         }}
         error={passwordError}
         isLoading={false}
+        groupPassword={groupPassword}
+        setGroupPassword={setGroupPassword}
       />
       {groupPassword && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">

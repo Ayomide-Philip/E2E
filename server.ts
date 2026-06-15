@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import next from "next";
 import { parse } from "node:url";
 import { Socket } from "node:net";
+import { count } from "node:console";
 
 const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
@@ -162,6 +163,14 @@ app.prepare().then(() => {
 
         rooms[roomId].add(ws);
         clientsRoom.set(ws, roomId);
+
+        ws.send(
+          JSON.stringify({
+            type: "joined-room",
+            roomId,
+            count: rooms[roomId].size,
+          }),
+        );
 
         for (const client of rooms[roomId]) {
           if (client.readyState === WebSocket.OPEN) {

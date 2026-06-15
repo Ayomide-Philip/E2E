@@ -11,6 +11,8 @@ type PasswordModalProps = {
   onClose: () => void;
   error?: string | null;
   isLoading?: boolean;
+  groupPassword: string | null;
+  setGroupPassword: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export default function PasswordModal({
@@ -20,14 +22,15 @@ export default function PasswordModal({
   onClose,
   error,
   isLoading = false,
+  groupPassword,
+  setGroupPassword,
 }: PasswordModalProps) {
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!password.trim()) return;
-    onPasswordSubmit(password.trim());
+    if (!groupPassword?.trim()) return;
+    onPasswordSubmit(groupPassword.trim());
   }
 
   return (
@@ -85,8 +88,8 @@ export default function PasswordModal({
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter room password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={groupPassword || ""}
+                  onChange={(e) => setGroupPassword(e.target.value)}
                   autoFocus
                   className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 pl-4 pr-11 py-2.5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400 dark:focus:border-violet-600 transition-all duration-300"
                 />
@@ -133,7 +136,7 @@ export default function PasswordModal({
               </motion.button>
               <motion.button
                 type="submit"
-                disabled={!password.trim() || isLoading}
+                disabled={!groupPassword?.trim() || isLoading}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="flex-1 rounded-xl bg-linear-to-br from-violet-500 to-purple-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"

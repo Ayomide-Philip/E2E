@@ -29,20 +29,33 @@ export default function Page() {
     null,
   );
 
+  const lastTypingSentRef = useRef(0);
+
   useEffect(() => {
     if (!input) return;
 
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      socketRef.current.send(
-        JSON.stringify({ type: "typing", isTyping: true }),
-      );
+    const now = Date.now();
+
+    if (now - lastTypingSentRef.current > 500) {
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.send(
+          JSON.stringify({ type: "typing", isTyping: true }),
+        );
+        lastTypingSentRef.current = now;
+      }
     }
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
-    typingTimeoutRef.current = setTimeout(() => {}, 2000);
+    typingTimeoutRef.current = setTimeout(() => {
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.send(
+          JSON.stringify({ type: "typing", isTyping: false }),
+        );
+      }
+    }, 2000);
 
     return () => {
       if (typingTimeoutRef.current) {
@@ -53,6 +66,15 @@ export default function Page() {
 
   function handleSend() {
     if (!input.trim()) return;
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
+        JSON.stringify({ type: "typing", isTyping: false }),
+      );
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
     const newMsg: Message = {
       text: input.trim(),
       sender: "me",
@@ -131,13 +153,20 @@ export default function Page() {
       }
 
       if (message?.type === "typing") {
-        setIsPartnerTyping(true);
-        if (partnerTypingTimeoutRef.current) {
-          clearTimeout(partnerTypingTimeoutRef.current);
-        }
-        partnerTypingTimeoutRef.current = setTimeout(() => {
+        if (message.isTyping === false) {
           setIsPartnerTyping(false);
-        }, 3000);
+          if (partnerTypingTimeoutRef.current) {
+            clearTimeout(partnerTypingTimeoutRef.current);
+          }
+        } else {
+          setIsPartnerTyping(true);
+          if (partnerTypingTimeoutRef.current) {
+            clearTimeout(partnerTypingTimeoutRef.current);
+          }
+          partnerTypingTimeoutRef.current = setTimeout(() => {
+            setIsPartnerTyping(false);
+          }, 3000);
+        }
       }
 
       if (message?.type === "message") {

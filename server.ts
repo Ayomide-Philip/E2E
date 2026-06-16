@@ -158,6 +158,10 @@ app.prepare().then(() => {
             );
             return;
           }
+
+          if (!rooms[roomId]) {
+            rooms[roomId] = new Set();
+          }
         }
 
         rooms[roomId].add(ws);
@@ -172,7 +176,7 @@ app.prepare().then(() => {
         );
 
         for (const client of rooms[roomId]) {
-          if (client.readyState === WebSocket.OPEN) {
+          if (client.readyState === WebSocket.OPEN && client !== ws) {
             client.send(
               JSON.stringify({
                 type: "peer-joined",

@@ -1,8 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { X, Loader2, Check, Hash, Copy, DoorOpen } from "lucide-react";
+import {
+  X,
+  Loader2,
+  Check,
+  Hash,
+  Copy,
+  DoorOpen,
+  Sparkles,
+} from "lucide-react";
 import generateRoomId from "@/lib/generatingRoomId";
 
 export default function CreateRoomModal({
@@ -12,21 +20,20 @@ export default function CreateRoomModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const [isCreating, setIsCreating] = useState(true);
+  const [phase, setPhase] = useState<"idle" | "creating" | "done">("idle");
   const [roomId, setRoomId] = useState<string | null>(null);
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  function handleCreate() {
+    setPhase("creating");
     const id = generateRoomId();
-    const timeout = setTimeout(() => {
+    setTimeout(() => {
       setRoomId(id);
-      setIsCreating(false);
+      setPhase("done");
       toast.success("Room created successfully!");
     }, 1200);
-
-    return () => clearTimeout(timeout);
-  }, []);
+  }
 
   function handleCopyLink() {
     if (!roomId) return;
@@ -71,7 +78,36 @@ export default function CreateRoomModal({
               <X className="h-4 w-4" />
             </button>
 
-            {isCreating ? (
+            {phase === "idle" && (
+              <motion.div
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center py-12"
+              >
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/25">
+                  <Sparkles className="h-7 w-7 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">
+                  Create a New Room
+                </h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 text-center max-w-xs">
+                  Generate a secure, encrypted room to start a private
+                  conversation.
+                </p>
+                <motion.button
+                  onClick={handleCreate}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 dark:bg-white px-6 py-3 text-sm font-semibold text-white dark:text-black hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-all duration-300 shadow-md"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Create Room
+                </motion.button>
+              </motion.div>
+            )}
+
+            {phase === "creating" && (
               <motion.div
                 key="creating"
                 initial={{ opacity: 0 }}
@@ -86,7 +122,9 @@ export default function CreateRoomModal({
                   Generating a secure room ID...
                 </p>
               </motion.div>
-            ) : (
+            )}
+
+            {phase === "done" && (
               <motion.div
                 key="created"
                 initial={{ opacity: 0, y: 10 }}

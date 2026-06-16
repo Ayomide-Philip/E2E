@@ -87,13 +87,17 @@ export default function Page() {
     socketRef.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
 
-      if (message.type === "joined-room") {
+      if (message?.type === "joined-room") {
         setStartGroupChat(true);
         setPasswordModalOpen(false);
         toast.success("Joined room successfully!");
         if (message.count > 1) {
           setStartGroupChat(true);
         }
+      }
+
+      if(message?.type === "peer-joined"){
+        toast.success("A new member joined the group chat")
       }
 
       if (message?.type === "require-password") {

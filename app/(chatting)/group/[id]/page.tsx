@@ -7,12 +7,11 @@ import MessageActive from "@/components/group/chat/messageActive";
 import GroupNavBar from "@/components/group/chat/navbar";
 import PasswordModal from "@/components/group/chat/passwordModal";
 import { toast } from "sonner";
+
 export type Message = {
   text: string;
   sender: "me" | "other" | "system";
   timestamp: string;
-  type?: "text" | "image" | "link";
-  linkUrl?: string;
 };
 
 export default function Page() {
@@ -25,14 +24,32 @@ export default function Page() {
   const [groupPassword, setGroupPassword] = useState<string | null>(null);
   const [startGroupChat, setStartGroupChat] = useState<boolean>(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const partnerTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setIsPartnerTyping(true);
-  //     setTimeout(() => setIsPartnerTyping(false), 3000);
-  //   }, 5000);
-  //   return () => clearTimeout(timer);
-  // }, []);
+  useEffect(() => {
+    if (!input) return;
+
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
+        JSON.stringify({ type: "typing", isTyping: true }),
+      );
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {}, 2000);
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [input, id]);
 
   function handleSend() {
     if (!input.trim()) return;
@@ -113,6 +130,16 @@ export default function Page() {
         setPasswordError("Incorrect password. Please try again.");
       }
 
+      if (message?.type === "typing") {
+        setIsPartnerTyping(true);
+        if (partnerTypingTimeoutRef.current) {
+          clearTimeout(partnerTypingTimeoutRef.current);
+        }
+        partnerTypingTimeoutRef.current = setTimeout(() => {
+          setIsPartnerTyping(false);
+        }, 3000);
+      }
+
       if (message?.type === "message") {
         const newMsg: Message = {
           text: message.text,
@@ -125,6 +152,9 @@ export default function Page() {
 
     return () => {
       socketRef.current?.close();
+      if (partnerTypingTimeoutRef.current) {
+        clearTimeout(partnerTypingTimeoutRef.current);
+      }
     };
   }, []);
 

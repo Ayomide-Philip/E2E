@@ -8,7 +8,6 @@ import GroupNavBar from "@/components/group/chat/navbar";
 import PasswordModal from "@/components/group/chat/passwordModal";
 import { toast } from "sonner";
 export type Message = {
-  id: string;
   text: string;
   sender: "me" | "other" | "system";
   timestamp: string;
@@ -38,7 +37,6 @@ export default function Page() {
   function handleSend() {
     if (!input.trim()) return;
     const newMsg: Message = {
-      id: Date.now().toString(),
       text: input.trim(),
       sender: "me",
       timestamp: new Date().toLocaleTimeString([], {
@@ -113,6 +111,15 @@ export default function Page() {
 
       if (message?.type === "require-password") {
         setPasswordError("Incorrect password. Please try again.");
+      }
+
+      if (message?.type === "message") {
+        const newMsg: Message = {
+          text: message.text,
+          sender: "other",
+          timestamp: message.timestamp,
+        };
+        setMessages((prev) => [...prev, newMsg]);
       }
     };
 

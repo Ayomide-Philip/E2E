@@ -3,6 +3,7 @@ import { Shield, Send } from "lucide-react";
 import MessageBubble from "./messageBubble";
 import TypingDots from "@/components/typingDot";
 import { useRef, useEffect } from "react";
+import { Message } from "@/app/(chatting)/group/[id]/page";
 
 export default function MessageActive({
   messages,
@@ -56,8 +57,8 @@ export default function MessageActive({
           }}
           className="flex flex-col gap-4"
         >
-          {messages.map((msg) => (
-            <MessageBubble key={msg.id} message={msg} />
+          {messages.map((msg, idx) => (
+            <MessageBubble key={idx} message={msg} />
           ))}
         </motion.div>
 
@@ -94,12 +95,3 @@ export default function MessageActive({
     </>
   );
 }
-
-type Message = {
-  id: string;
-  text: string;
-  sender: "me" | "other" | "system";
-  timestamp: string;
-  type?: "text" | "image" | "link";
-  linkUrl?: string;
-};

@@ -88,7 +88,6 @@ export default function Page() {
       const message = JSON.parse(event.data);
 
       if (message?.type === "joined-room") {
-        setStartGroupChat(true);
         setPasswordModalOpen(false);
         toast.success("Joined room successfully!");
         if (message.count > 1) {
@@ -96,8 +95,11 @@ export default function Page() {
         }
       }
 
-      if(message?.type === "peer-joined"){
-        toast.success("A new member joined the group chat")
+      if (message?.type === "peer-joined") {
+        if (message?.count > 1) {
+          setStartGroupChat(true);
+        }
+        toast.success("A new member joined the group chat");
       }
 
       if (message?.type === "require-password") {
@@ -109,8 +111,6 @@ export default function Page() {
       socketRef.current?.close();
     };
   }, []);
-
-  const isPartnerJoined = true;
 
   return (
     <div className="relative h-screen w-full bg-zinc-50 dark:bg-linear-to-br dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden flex flex-col">
@@ -130,9 +130,9 @@ export default function Page() {
           backgroundSize: "40px 40px",
         }}
       />
-      <GroupNavBar id={id} isPartnerJoined={isPartnerJoined} />
+      <GroupNavBar id={id} isPartnerJoined={startGroupChat} />
       <main className="relative z-10 flex-1 flex flex-col min-h-0">
-        {!isPartnerJoined ? (
+        {!startGroupChat ? (
           <WaitingScreen roomId={id} />
         ) : (
           <MessageActive

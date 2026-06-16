@@ -99,7 +99,7 @@ type Message = {
   id: string;
   text: string;
   sender: "me" | "other" | "system";
-  timestamp: Date;
+  timestamp: string;
   type?: "text" | "image" | "link";
   linkUrl?: string;
 };

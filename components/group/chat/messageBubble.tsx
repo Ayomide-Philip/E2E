@@ -1,3 +1,4 @@
+import { Message } from "@/app/(chatting)/group/[id]/page";
 import { motion } from "framer-motion";
 import { Check, ImageIcon, Link2, Shield } from "lucide-react";
 export default function MessageBubble({ message }: { message: Message }) {
@@ -71,27 +72,15 @@ export default function MessageBubble({ message }: { message: Message }) {
         )}
         <div
           className={`flex items-center justify-end gap-1 mt-0.5 ${
-            isMe ? "text-white/50" : "text-zinc-400 dark:text-zinc-500"
+            isMe
+              ? "text-white/50 dark:text-black/40"
+              : "text-zinc-400 dark:text-zinc-500"
           }`}
         >
-          <span className="text-[10px]">
-            {message.timestamp.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
+          <span className="text-[10px]">{message.timestamp}</span>
           {isMe && <Check className="h-3 w-3" />}
         </div>
       </div>
     </motion.div>
   );
 }
-
-type Message = {
-  id: string;
-  text: string;
-  sender: "me" | "other" | "system";
-  timestamp: Date;
-  type?: "text" | "image" | "link";
-  linkUrl?: string;
-};

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-import { Lock } from "lucide-react";
 import WaitingScreen from "@/components/group/chat/waitingState";
 import MessageActive from "@/components/group/chat/messageActive";
 import GroupNavBar from "@/components/group/chat/navbar";
@@ -12,7 +11,7 @@ export type Message = {
   id: string;
   text: string;
   sender: "me" | "other" | "system";
-  timestamp: Date;
+  timestamp: string;
   type?: "text" | "image" | "link";
   linkUrl?: string;
 };
@@ -26,16 +25,15 @@ export default function Page() {
   const [passwordModalOpen, setPasswordModalOpen] = useState(true);
   const [groupPassword, setGroupPassword] = useState<string | null>(null);
   const [startGroupChat, setStartGroupChat] = useState<boolean>(false);
-  const [showPasswordInfo, setShowPasswordInfo] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPartnerTyping(true);
-      setTimeout(() => setIsPartnerTyping(false), 3000);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsPartnerTyping(true);
+  //     setTimeout(() => setIsPartnerTyping(false), 3000);
+  //   }, 5000);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   function handleSend() {
     if (!input.trim()) return;
@@ -43,8 +41,19 @@ export default function Page() {
       id: Date.now().toString(),
       text: input.trim(),
       sender: "me",
-      timestamp: new Date(),
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
+    socketRef.current?.send(
+      JSON.stringify({
+        type: "message",
+        text: input.trim(),
+        timestamp: newMsg.timestamp,
+      }),
+    );
+
     setMessages((prev) => [...prev, newMsg]);
     setInput("");
   }
@@ -155,22 +164,6 @@ export default function Page() {
         groupPassword={groupPassword}
         setGroupPassword={setGroupPassword}
       />
-      {groupPassword && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-          <button
-            onClick={() => setShowPasswordInfo((prev) => !prev)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 dark:bg-white/10 backdrop-blur-xl border border-zinc-700/50 dark:border-zinc-600/30 text-[11px] text-zinc-400 dark:text-zinc-500 hover:text-zinc-300 dark:hover:text-zinc-300 transition-all"
-          >
-            <Lock className="h-3 w-3" />
-            <span>Room secured</span>
-            {showPasswordInfo && (
-              <span className="font-mono text-violet-400 dark:text-violet-300">
-                {groupPassword}
-              </span>
-            )}
-          </button>
-        </div>
-      )}{" "}
     </div>
   );
 }

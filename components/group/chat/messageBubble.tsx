@@ -2,8 +2,8 @@ import { Message } from "@/app/(chatting)/group/[id]/page";
 import { motion } from "framer-motion";
 import { Check, Shield } from "lucide-react";
 export default function MessageBubble({ message }: { message: Message }) {
-  const isMe = message.sender === "me";
-  const isSystem = message.sender === "system";
+  const isMe = message?.sender === "me";
+  const isSystem = message?.sender === "system";
 
   if (isSystem) {
     return (
@@ -15,7 +15,7 @@ export default function MessageBubble({ message }: { message: Message }) {
         <div className="flex items-center gap-1.5 rounded-full bg-zinc-100/70 dark:bg-zinc-800/50 px-3 py-1.5 backdrop-blur-sm">
           <Shield className="h-3 w-3 text-emerald-500" />
           <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
-            {message.text}
+            {message?.text}
           </span>
         </div>
       </motion.div>
@@ -39,7 +39,7 @@ export default function MessageBubble({ message }: { message: Message }) {
             : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-800/85 rounded-tl-xs shadow-xs"
         }`}
       >
-        <p className="whitespace-pre-wrap wrap-break-word">{message.text}</p>
+        <p className="whitespace-pre-wrap wrap-break-word">{message?.text}</p>
         <div
           className={`flex items-center justify-end gap-1 mt-0.5 ${
             isMe
@@ -47,7 +47,7 @@ export default function MessageBubble({ message }: { message: Message }) {
               : "text-zinc-400 dark:text-zinc-500"
           }`}
         >
-          <span className="text-[10px]">{message.timestamp}</span>
+          <span className="text-[10px]">{message?.timestamp}</span>
           {isMe && <Check className="h-3 w-3" />}
         </div>
       </div>

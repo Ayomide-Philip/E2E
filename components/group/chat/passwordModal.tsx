@@ -13,6 +13,8 @@ type PasswordModalProps = {
   isLoading?: boolean;
   groupPassword: string | null;
   setGroupPassword: React.Dispatch<React.SetStateAction<string | null>>;
+  userName: string;
+  setUserName: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export default function PasswordModal({
@@ -24,6 +26,8 @@ export default function PasswordModal({
   isLoading = false,
   groupPassword,
   setGroupPassword,
+  userName,
+  setUserName,
 }: PasswordModalProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -42,7 +46,6 @@ export default function PasswordModal({
             if (e.target === e.currentTarget) onClose();
           }}
         >
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -50,7 +53,6 @@ export default function PasswordModal({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           />
 
-          {/* Modal */}
           <motion.form
             onSubmit={handleSubmit}
             initial={{ opacity: 0, scale: 0.92, y: 20 }}
@@ -59,7 +61,6 @@ export default function PasswordModal({
             transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
             className="relative w-full max-w-md rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl"
           >
-            {/* Icon */}
             <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
               <Lock className="h-6 w-6 text-white" />
             </div>
@@ -77,6 +78,20 @@ export default function PasswordModal({
               <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
                 Room: {roomId}
               </p>
+            </div>
+
+            {/* Username input */}
+            <div className="space-y-1.5 mb-4">
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Your Name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your display name"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 pl-4 pr-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400 dark:focus:border-violet-600 transition-all duration-300"
+              />
             </div>
 
             {/* Password input */}

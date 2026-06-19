@@ -32,6 +32,11 @@ export default function MessageBubble({ message }: { message: Message }) {
         isMe ? "self-end items-end" : "self-start items-start"
       }`}
     >
+      {message?.name && (
+        <span className="text-[11px] font-medium text-violet-500 dark:text-violet-400 mb-1 px-1">
+          {message.name}
+        </span>
+      )}
       <div
         className={`px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs sm:text-sm leading-relaxed max-w-full ${
           isMe

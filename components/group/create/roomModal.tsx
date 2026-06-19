@@ -26,7 +26,6 @@ export default function CreateRoomModal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const createdRef = useRef(false);
 
-  // Auto-create the room as soon as the modal opens
   useEffect(() => {
     if (open && !createdRef.current) {
       createdRef.current = true;
@@ -38,7 +37,6 @@ export default function CreateRoomModal({
         toast.success("Room created successfully!");
       }, 1200);
     }
-    // Reset the ref when modal closes so it can create again next time
     if (!open) {
       createdRef.current = false;
     }

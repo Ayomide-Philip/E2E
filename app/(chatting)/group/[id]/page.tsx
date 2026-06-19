@@ -11,11 +11,13 @@ import { toast } from "sonner";
 export type Message = {
   text: string;
   sender: "me" | "other" | "system";
-  timestamp: string;
+  timestamp?: string;
+  name?: string;
 };
 
 export default function Page() {
   const { id } = useParams<{ id: string }>();
+  const [userName, setUserName] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isPartnerTyping, setIsPartnerTyping] = useState(false);
@@ -82,12 +84,14 @@ export default function Page() {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      name: userName || "Anonymous",
     };
     socketRef.current?.send(
       JSON.stringify({
         type: "message",
         text: input.trim(),
         timestamp: newMsg.timestamp,
+        name: userName || "Anonymous",
       }),
     );
 
@@ -109,6 +113,7 @@ export default function Page() {
           type: "join-room",
           roomId: id,
           roomPassword: password,
+          userName: userName || "Anonymous",
         }),
       );
     } else {
@@ -145,7 +150,13 @@ export default function Page() {
         if (message?.count > 1) {
           setStartGroupChat(true);
         }
-        toast.success("A new member joined the group chat");
+        setMessages((prev) => {
+          const systemMsg: Message = {
+            text: "A new participant has joined the chat.",
+            sender: "system",
+          };
+          return [...prev, systemMsg];
+        });
       }
 
       if (message?.type === "require-password") {
@@ -174,6 +185,7 @@ export default function Page() {
           text: message.text,
           sender: "other",
           timestamp: message.timestamp,
+          name: message.name,
         };
         setMessages((prev) => [...prev, newMsg]);
       }
@@ -229,6 +241,8 @@ export default function Page() {
         isLoading={false}
         groupPassword={groupPassword}
         setGroupPassword={setGroupPassword}
+        userName={userName}
+        setUserName={setUserName}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,6 +24,25 @@ export default function CreateRoomModal({
   const [roomId, setRoomId] = useState<string | null>(null);
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
+  const createdRef = useRef(false);
+
+  // Auto-create the room as soon as the modal opens
+  useEffect(() => {
+    if (open && !createdRef.current) {
+      createdRef.current = true;
+      setPhase("creating");
+      const id = generateRoomId();
+      setTimeout(() => {
+        setRoomId(id);
+        setPhase("done");
+        toast.success("Room created successfully!");
+      }, 1200);
+    }
+    // Reset the ref when modal closes so it can create again next time
+    if (!open) {
+      createdRef.current = false;
+    }
+  }, [open]);
 
   function handleCreate() {
     setPhase("creating");

@@ -8,8 +8,10 @@ const app = next({ dev: process.env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
 const rooms: Record<string, Set<WebSocket>> = {};
 const clientsRoom = new Map<WebSocket, string>();
-const groups: Record<string, { password?: string }> = {};
+const groups: Record<string, { password: string }> = {};
 const clientsPublicKeys = new Map<WebSocket, string>();
+const roomUsernames: Record<string, Set<string>> = {};
+const clientsUsername = new Map<WebSocket, string>();
 
 app.prepare().then(() => {
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -130,7 +132,10 @@ app.prepare().then(() => {
           }
         }
       } else if (m.type === "join-room") {
-        const { roomId, roomPassword } = m;
+        const { roomId, roomPassword, userName } = m;
+
+        if (!userName.trim()) {
+        }
 
         if (!groups[roomId]) {
           if (!roomPassword) {
@@ -145,6 +150,7 @@ app.prepare().then(() => {
           }
           groups[roomId] = { password: roomPassword };
           rooms[roomId] = new Set();
+          roomUsernames[roomId] = new Set();
         } else {
           if (
             groups[roomId].password &&
@@ -158,7 +164,15 @@ app.prepare().then(() => {
             );
             return;
           }
-
+          if (roomUsernames[roomId].has(userName)) {
+            ws.send(
+              JSON.stringify({
+                type: "username-error",
+                message: "Username already taken in this room",
+              }),
+            );
+            return;
+          }
           if (!rooms[roomId]) {
             rooms[roomId] = new Set();
           }
@@ -166,6 +180,8 @@ app.prepare().then(() => {
 
         rooms[roomId].add(ws);
         clientsRoom.set(ws, roomId);
+        clientsUsername.set(ws, userName);
+        roomUsernames[roomId].add(userName.trim().toLowerCase());
 
         ws.send(
           JSON.stringify({
@@ -195,6 +211,13 @@ app.prepare().then(() => {
 
       if (roomId && rooms[roomId]) {
         rooms[roomId].delete(ws);
+
+        // NEW: free up the username so it can be reused
+        const userName = clientsUsername.get(ws);
+        if (userName && roomUsernames[roomId]) {
+          roomUsernames[roomId].delete(userName);
+        }
+
         for (const client of rooms[roomId]) {
           if (client.readyState === WebSocket.OPEN) {
             client.send(
@@ -209,9 +232,13 @@ app.prepare().then(() => {
 
       if (rooms[roomId].size === 0) {
         delete rooms[roomId];
+        delete roomUsernames[roomId];
+        delete groups[roomId];
       }
 
       clientsRoom.delete(ws);
+      clientsUsername.delete(ws);
+      clientsPublicKeys.delete(ws);
       console.log("WebSocket connection closed");
     });
   });

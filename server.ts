@@ -135,6 +135,13 @@ app.prepare().then(() => {
         const { roomId, roomPassword, userName } = m;
 
         if (!userName.trim()) {
+          ws.send(
+            JSON.stringify({
+              type: "required-us",
+              message: "Username is required",
+            }),
+          );
+          return;
         }
 
         if (!groups[roomId]) {

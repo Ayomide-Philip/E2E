@@ -163,6 +163,12 @@ export default function Page() {
         setPasswordError("Incorrect password. Please try again.");
       }
 
+      if (message?.type === "required-username") {
+        setPasswordError(
+          message?.message || "Username is required. Please enter a username.",
+        );
+      }
+
       if (message?.type === "typing") {
         if (message.isTyping === false) {
           setIsPartnerTyping(false);

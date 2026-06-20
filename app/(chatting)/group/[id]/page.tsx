@@ -137,6 +137,7 @@ export default function Page() {
 
     socketRef.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      console.log(message);
 
       if (message?.type === "joined-room") {
         setPasswordModalOpen(false);
@@ -167,6 +168,10 @@ export default function Page() {
         setPasswordError(
           message?.message || "Username is required. Please enter a username.",
         );
+      }
+
+      if (message?.type === "username-error") {
+        setPasswordError(message?.message || "Username is not available");
       }
 
       if (message?.type === "typing") {

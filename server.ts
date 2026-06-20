@@ -171,7 +171,7 @@ app.prepare().then(() => {
             );
             return;
           }
-          if (roomUsernames[roomId].has(userName)) {
+          if (roomUsernames[roomId].has(userName.trim().toLowerCase())) {
             ws.send(
               JSON.stringify({
                 type: "username-error",
@@ -187,7 +187,7 @@ app.prepare().then(() => {
 
         rooms[roomId].add(ws);
         clientsRoom.set(ws, roomId);
-        clientsUsername.set(ws, userName);
+        clientsUsername.set(ws, userName.trim().toLoweCase());
         roomUsernames[roomId].add(userName.trim().toLowerCase());
 
         ws.send(

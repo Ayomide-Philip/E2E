@@ -34,7 +34,7 @@ export default function MessageBubble({ message }: { message: Message }) {
     >
       {message?.name && (
         <span className="text-[11px] font-medium text-violet-500 dark:text-violet-400 mb-1 px-1">
-          {message.name}
+          {message?.name}
         </span>
       )}
       <div

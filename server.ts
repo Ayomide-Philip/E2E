@@ -137,7 +137,7 @@ app.prepare().then(() => {
         if (!userName.trim()) {
           ws.send(
             JSON.stringify({
-              type: "required-us",
+              type: "required-username",
               message: "Username is required",
             }),
           );

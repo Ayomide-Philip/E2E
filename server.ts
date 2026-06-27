@@ -187,7 +187,7 @@ app.prepare().then(() => {
 
         rooms[roomId].add(ws);
         clientsRoom.set(ws, roomId);
-        clientsUsername.set(ws, userName.trim().toLoweCase());
+        clientsUsername.set(ws, userName.trim().toLowerCase());
         roomUsernames[roomId].add(userName.trim().toLowerCase());
 
         ws.send(
